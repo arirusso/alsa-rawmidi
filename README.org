@@ -1,0 +1,41 @@
+#+COMMENT: -*- org -*-
+#+TITLE: alsa rawmidi
+#+AUTHOR: Ari Russo
+#+DATE: 2010-12-10 Fri
+#+TEXT: Interact with the ALSA RawMIDI API in Ruby
+#+KEYWORDS: MIDI, ruby, ALSA, rawmidi, linux, sysex
+#+LANGUAGE:  en
+#+LINK_HOME: http://github.com/arirusso/alsa-rawmidi
+
+Author:: Ari Russo
+Copyright:: Copyright (c) 2010-2011 Ari Russo
+
+* Summary
+
+Low-level, realtime MIDI IO for Ruby in Linux using the ALSA RawMIDI driver interface
+
+* Features
+
+	- Full input and output
+	- Handle all MIDI Message including SysEx
+
+* Requirements
+
+	- ffi (gem install ffi)
+	- libasound, libasound-dev packages
+
+* Install
+
+	- gem install alsa-rawmidi
+	
+* Examples
+
+	- see examples/ directory
+	
+* Tests
+
+	- please see test/config.rb before running tests 
+	
+* License
+
+Apache 2.0, See the file LICENSE  
