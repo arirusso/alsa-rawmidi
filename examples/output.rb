@@ -5,15 +5,15 @@ require 'alsa-rawmidi'
 
 # this program selects the first midi output and sends some arpeggiated chords to it
 
+notes = [36, 40, 43] # C E G
+octaves = 6
+duration = 0.1
+
 # AlsaRawMIDI::Device.all.to_s will list your midi outputs
 # or amidi -l from the command line
-
+	
 output = AlsaRawMIDI::Device.first(:output)
 output.enable do |output|
-
-	notes = [36, 40, 43] # C E G
-	octaves = 6
-	duration = 0.1
 
 	5.times do |i|
 		notes.each do |note|
