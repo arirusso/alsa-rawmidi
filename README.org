@@ -38,9 +38,10 @@ Low-level, realtime MIDI input and output for Ruby in Linux using the ALSA RawMI
 
 	- please see test/config.rb before running tests
 	
-* Notes
+* Notes / To-Do
 
-	- As of yet, this has only been tested on Ubuntu 10.10 with Ruby 1.9.2 using a Roland UM-2 MIDI interface 
+	- The gem should be ready in a few days after some more testing
+	- As of yet, this has only been tested on Ubuntu 10.10 with Ruby 1.9.2 using a Roland UM-2 MIDI interface
 	
 * License
 
