@@ -8,6 +8,7 @@
 #+LINK_HOME: http://github.com/arirusso/alsa-rawmidi
 
 Author:: Ari Russo
+
 Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 * Summary
@@ -22,7 +23,7 @@ Low-level, realtime MIDI input and output for Ruby in Linux using the ALSA RawMI
 
 * Requirements
 
-	- ffi (gem install ffi)
+	- [[https://github.com/ffi/ffi][ffi]] (gem install ffi)
 	- libasound, libasound-dev packages
 
 * Install
@@ -35,7 +36,11 @@ Low-level, realtime MIDI input and output for Ruby in Linux using the ALSA RawMI
 	
 * Tests
 
-	- please see test/config.rb before running tests 
+	- please see test/config.rb before running tests
+	
+* Notes
+
+	- As of yet, this has only been tested on Ubuntu 10.10 with Ruby 1.9.2 using a Roland UM-2 MIDI interface 
 	
 * License
 
