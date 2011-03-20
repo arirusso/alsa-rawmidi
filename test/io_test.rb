@@ -6,7 +6,7 @@ class IoTest < Test::Unit::TestCase
   include TestHelper
   include TestHelper::Config # before running these tests, adjust the constants in config.rb to suit your hardware setup
   
-  # this assumes that TestOutput is connected to TestInput
+  # ** this test assumes that TestOutput is connected to TestInput
   def test_full_io
   	
     messages = VariousMIDIMessages
@@ -38,9 +38,10 @@ class IoTest < Test::Unit::TestCase
    
   end
   
-  # this assumes that TestOutput is connected to TestInput
+  # ** this test assumes that TestOutput is connected to TestInput
   def test_full_io_bytestr
-	sleep(2)  	
+  	sleep(1) # pause between tests
+  	
     messages = VariousMIDIByteStrMessages
 
   	input = TestInput
