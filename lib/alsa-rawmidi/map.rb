@@ -138,7 +138,6 @@ module AlsaRawMIDI
              :substream, :pointer, # void (*event)(struct snd_rawmidi_substream *substream);
              # defers calls to event [input] or ops->trigger [output]
              :tasklet, Tasklet.by_value,
-             # private daya
              :private_data, :pointer, # void*
              :private_free, :pointer # void (*private_free)(struct snd_rawmidi_substream *substream)
     end

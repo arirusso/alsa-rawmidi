@@ -28,19 +28,23 @@ module AlsaRawMIDI
       @enabled = false
     end
     
+    # close the device
     def close
       Map.snd_rawmidi_drain(@handle)
       Map.snd_rawmidi_close(@handle)
     end
     
+    # select the first device of type <em>type</em>
     def self.first(type)
       all_by_type[type].first
     end
     
+    # select the last device of type <em>type</em>
     def self.last(type)
       all_by_type[type].last
     end
     
+    # a hash of :input and :output devices
     def self.all_by_type
       available_devices = { :input => [], :output => [] }
       count = 0
@@ -55,6 +59,7 @@ module AlsaRawMIDI
       available_devices
     end
     
+    # all devices of both types
     def self.all
       all_by_type.values.flatten
     end

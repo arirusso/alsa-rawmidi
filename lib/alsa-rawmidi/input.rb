@@ -36,7 +36,7 @@ module AlsaRawMIDI
     
     alias_method :read, :read_buffer
     
-    # enable this the input device for use
+    # enable this the input device for use, can be passed a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(handle_ptr, nil, @id, Map::Constants[:SND_RAWMIDI_NONBLOCK]) # 

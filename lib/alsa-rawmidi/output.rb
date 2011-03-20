@@ -8,6 +8,7 @@ module AlsaRawMIDI
     
     include Device
     
+    # this takes a string of hex digits 
     def output_message_bytestr(data)
       data = data.dup
 	  output = []
@@ -17,7 +18,7 @@ module AlsaRawMIDI
       output_message(output)
     end
     
-    # this takes an array of bytes 
+    # this takes an array of numeric bytes 
     def output_message(data)
 
       format = "C" * data.size
@@ -30,6 +31,7 @@ module AlsaRawMIDI
     
     alias_method :message, :output_message
     
+    # enable this device, also takes a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(nil, handle_ptr, @id, 0)

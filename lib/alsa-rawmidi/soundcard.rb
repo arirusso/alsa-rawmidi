@@ -15,7 +15,7 @@ module AlsaRawMIDI
       32.times do |i|
         devnum = FFI::MemoryPointer.new(:int).write_int(i)
         if (err = Map.snd_ctl_rawmidi_next_device(handle, devnum)) < 0
-          break
+          break # fix this
         end
         @subdevices.keys.each do |type|
           populate_subdevices(type, handle, card_num, i)
@@ -42,9 +42,9 @@ module AlsaRawMIDI
     def populate_subdevices(type, ctl_ptr, card_num, device_num)
       ctype, dtype = *case type
       when :input
-      [Map::Constants['SND_RAWMIDI_STREAM_INPUT'], Input]
+      [Map::Constants[:SND_RAWMIDI_STREAM_INPUT], Input]
       when :output
-      [Map::Constants['SND_RAWMIDI_STREAM_OUTPUT'], Output]
+      [Map::Constants[:SND_RAWMIDI_STREAM_OUTPUT], Output]
     end
     info = Map::SndRawMIDIInfo.new
     Map.snd_rawmidi_info_set_device(info.pointer, device_num)
@@ -54,16 +54,14 @@ module AlsaRawMIDI
     available = []
     while (i <= subdev_count)
       Map.snd_rawmidi_info_set_subdevice(info.pointer, i)
+      # fix this
       if (err = Map.snd_ctl_rawmidi_info(ctl_ptr, info.pointer)) < 0
-        #$>.puts "Can't get info for MIDI output subdevice hw:#{card_num},#{device_num},#{i}: #{Map.snd_strerror(err).to_s}"
-        
         break
       end
 
       if (i < 1)        
         subdev_count = Map.snd_rawmidi_info_get_subdevices_count(info.pointer)
         subdev_count = (subdev_count > 32) ? 0 : subdev_count
-        #$>.puts "Found #{subdev_count} MIDI #{type.to_s} subdevices on card #{card_num}"
       end
 
       name = info[:name].to_s
