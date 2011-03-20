@@ -53,6 +53,7 @@ module AlsaRawMIDI
       end
     end
     
+    # close the device and kill the message collector process
     def close
       Process.kill(9, @p2) # kill collector process
       Map.snd_rawmidi_drain(@handle)
@@ -62,10 +63,11 @@ module AlsaRawMIDI
     private
     
     def get_message_formatted(raw)
-    	time = ((Time.now.to_f - @start_time) * 1000).to_i # conform this to the winmm format
+    	time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
       	{ :data => raw, :timestamp => time }
     end
     
+    # launch a background process that collects messages
     def start_collector
       @rd, @wr = IO.pipe
       @p2 = Process.fork do

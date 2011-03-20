@@ -13,7 +13,7 @@ Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 * Summary
 
-Low-level, realtime MIDI input and output for Ruby in Linux using the ALSA RawMIDI driver interface
+A Ruby library for performing low level, realtime MIDI input and output in Linux.  Uses the ALSA RawMIDI driver interface API
 
 * Features
 
