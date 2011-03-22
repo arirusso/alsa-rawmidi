@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 #
 # Set of modules and classes for interacting with the ALSA Driver Interface
 #

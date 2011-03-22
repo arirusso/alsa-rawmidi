@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 class Hash
 	
 	# change string keys to symbols
