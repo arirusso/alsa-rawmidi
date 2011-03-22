@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 module TestHelper::Config
   		
   	include AlsaRawMIDI
