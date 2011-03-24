@@ -13,19 +13,16 @@ duration = 0.1
 
 # AlsaRawMIDI::Device.all.to_s will list your midi outputs
 # or amidi -l from the command line
-	
-output = AlsaRawMIDI::Device.first(:output)
-output.enable do |output|
 
-	5.times do |i|
-		notes.each do |note|
-			oct = i * 12
-			note_message = [0x90, note + oct, 100]
-			output.output_message(note_message)
-			sleep(duration)
-			off_message = [0x80, note + oct, 100]
-			output.output_message(off_message)
-		end
-	end
-	
+output = AlsaRawMIDI::Device.first(:output)
+output.open do |output|
+
+  (0..48).step(12) do |oct|
+    notes.each do |note|
+      output.puts(0x90, note + oct, 100)
+      sleep(duration)
+      output.puts(0x80, note + oct, 100)
+    end
+  end
+
 end

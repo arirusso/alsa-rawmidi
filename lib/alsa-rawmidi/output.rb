@@ -10,17 +10,17 @@ module AlsaRawMIDI
     include Device
     
     # this takes a string of hex digits 
-    def output_message_bytestr(data)
+    def puts_bytestr(data)
       data = data.dup
 	  output = []
       until (str = data.slice!(0,2)).eql?("")
       	output << str.hex
       end
-      output_message(output)
+      puts_bytes(*output)
     end
-    
+
     # this takes an array of numeric bytes 
-    def output_message(data)
+    def puts_bytes(*data)
 
       format = "C" * data.size
       bytes = FFI::MemoryPointer.new(data.size).put_bytes(0, data.pack(format))
@@ -30,7 +30,14 @@ module AlsaRawMIDI
       
     end
     
-    alias_method :message, :output_message
+    def puts(*a)
+  	  case a.first
+        when Array then puts_bytes(*a.first)
+    	when Numeric then puts_bytes(*a)
+    	when String then puts_bytestr(*a)
+      end
+    end
+    alias_method :write, :puts
     
     # enable this device, also takes a block
     def enable(options = {}, &block)
@@ -46,7 +53,9 @@ module AlsaRawMIDI
       	end
       end
     end
-    
+    alias_method :open, :enable
+    alias_method :start, :enable
+
   end
   
 end

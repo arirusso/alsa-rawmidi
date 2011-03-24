@@ -5,7 +5,7 @@ $LOAD_PATH.unshift dir + '/../lib'
 
 require 'alsa-rawmidi'
 
-# this program selects the first midi input and sends an inspection of the first 10 messages 
+# this program selects the first midi input and sends an inspection of the first 10 messages
 # messages it receives to standard out
 
 num_messages = 10
@@ -13,15 +13,15 @@ num_messages = 10
 # AlsaRawMIDI::Device.all.to_s will list your midi outputs
 # or amidi -l from the command line
 
-AlsaRawMIDI::Device.first(:input).enable do |input|
+AlsaRawMIDI::Device.first(:input).open do |input|
 
-	$>.puts "send some MIDI to your input now..."
+  $>.puts "send some MIDI to your input now..."
 
-	num_messages.times do
-		m = input.read
-		$>.puts(m)
-	end
+  num_messages.times do
+    m = input.read
+    $>.puts(m)
+  end
 
-	$>.puts "finished"
+  $>.puts "finished"
 
 end
