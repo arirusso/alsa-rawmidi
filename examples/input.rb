@@ -18,7 +18,7 @@ AlsaRawMIDI::Device.first(:input).open do |input|
   $>.puts "send some MIDI to your input now..."
 
   num_messages.times do
-    m = input.read
+    m = input.gets
     $>.puts(m)
   end
 

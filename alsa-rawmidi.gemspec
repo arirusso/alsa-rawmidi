@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "alsa-rawmidi"
 
-  s.add_dependency "ffi"
+  s.add_dependency "ffi", ">= 1.0"
 
   s.files        = Dir.glob("{lib}/**/*") + %w(LICENSE README.org)
   s.require_path = 'lib'
