@@ -9,7 +9,7 @@ module AlsaRawMIDI
     
     include Device
     
-    # this takes a string of hex digits 
+    # this takes a String of hex digits 
     def puts_bytestr(data)
       data = data.dup
 	  output = []
@@ -19,7 +19,7 @@ module AlsaRawMIDI
       puts_bytes(*output)
     end
 
-    # this takes an array of numeric bytes 
+    # sends a message consisting of Numeric bytes 
     def puts_bytes(*data)
 
       format = "C" * data.size
@@ -30,6 +30,7 @@ module AlsaRawMIDI
       
     end
     
+    # send a message of an indeterminant type
     def puts(*a)
   	  case a.first
         when Array then puts_bytes(*a.first)

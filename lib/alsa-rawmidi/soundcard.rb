@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 module AlsaRawMIDI
+	
   class Soundcard
 
     attr_reader :subdevices

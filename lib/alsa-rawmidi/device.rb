@@ -9,12 +9,13 @@ module AlsaRawMIDI
   module Device
 
     attr_reader :enabled, # has the device been initialized?
-                    :id, # the id of the device
-                    :name,
-                    :subname,
-                    :type # :input or :output
+                :id, # the id of the device
+                :name,
+                :subname,
+                :type # :input or :output
 
     alias_method :enabled?, :enabled
+    
     def initialize(id, options = {}, &block)
       @name = options[:name]
       @subname = options[:subname]
@@ -42,7 +43,7 @@ module AlsaRawMIDI
       all_by_type[type].last
     end
 
-    # a hash of :input and :output devices
+    # a Hash of :input and :output devices
     def self.all_by_type
       available_devices = { :input => [], :output => [] }
       count = 0

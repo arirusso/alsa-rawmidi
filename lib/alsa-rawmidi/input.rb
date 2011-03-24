@@ -10,6 +10,7 @@ module AlsaRawMIDI
     include Device
 
     BufferSize = 2048
+    
     #
     # returns an array of MIDI event hashes as such:
     # [
@@ -60,12 +61,13 @@ module AlsaRawMIDI
 
     private
 
+	# give a message its timestamp and package it in a Hash
     def get_message_formatted(raw)
       time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
       { :data => raw, :timestamp => time }
     end
 
-    # launch a background process that collects messages
+    # launch a background thread that collects messages
     def spawn_listener
       @listener = Thread.fork do
         while (raw = get_buffer).eql?("") do
@@ -75,7 +77,7 @@ module AlsaRawMIDI
       end
     end
 
-    # gets the next bytes from the buffer
+    # Get the next bytes from the buffer
     def get_buffer
       buffer = FFI::MemoryPointer.new(:char, Input::BufferSize)
       if (err = Map.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
