@@ -10,10 +10,10 @@ require 'alsa-rawmidi'
 
 num_messages = 10
 
-# AlsaRawMIDI::Device.all.to_s will list your midi outputs
+# AlsaRawMIDI::Device.all.to_s will list your midi devices
 # or amidi -l from the command line
 
-AlsaRawMIDI::Device.first(:input).open do |input|
+AlsaRawMIDI::Input.first.open do |input|
 
   $>.puts "send some MIDI to your input now..."
 

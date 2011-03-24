@@ -57,6 +57,18 @@ module AlsaRawMIDI
     alias_method :open, :enable
     alias_method :start, :enable
 
+    def self.first
+      Device.first(:output)	
+    end
+
+    def self.last
+      Device.last(:output)	
+    end
+    
+    def self.all
+      Device.all_by_type[:output]
+    end
+    
   end
   
 end

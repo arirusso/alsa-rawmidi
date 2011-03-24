@@ -11,10 +11,10 @@ notes = [36, 40, 43] # C E G
 octaves = 6
 duration = 0.1
 
-# AlsaRawMIDI::Device.all.to_s will list your midi outputs
+# AlsaRawMIDI::Device.all.to_s will list your midi devices
 # or amidi -l from the command line
 
-output = AlsaRawMIDI::Device.first(:output)
+output = AlsaRawMIDI::Output.first
 output.open do |output|
 
   (0..48).step(12) do |oct|

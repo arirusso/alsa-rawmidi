@@ -86,7 +86,19 @@ module AlsaRawMIDI
       rawstr = buffer.get_bytes(0,Input::BufferSize)
       rawstr.eql?("") ? rawstr : rawstr.unpack("A*").first.unpack("H*").first.upcase
     end
+    
+    def self.first
+      Device.first(:input)	
+    end
 
+    def self.last
+      Device.last(:input)	
+    end
+    
+    def self.all
+      Device.all_by_type[:input]
+    end
+    
   end
 
 end
