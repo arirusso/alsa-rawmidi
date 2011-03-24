@@ -32,7 +32,8 @@ A Ruby library for performing low level, realtime MIDI input and output in Linux
 	
 * Examples
 
-	- see examples/ directory
+	- [[https://github.com/arirusso/alsa-rawmidi/blob/master/examples/input.rb][input]]
+	- [[https://github.com/arirusso/alsa-rawmidi/blob/master/examples/output.rb][output]]
 	
 * Tests
 
