@@ -10,14 +10,14 @@ Gem::Specification.new do |s|
   s.authors     = ["Ari Russo"]
   s.email       = ["ari.russo@gmail.com"]
   s.homepage    = "http://github.com/arirusso/alsa-rawmidi"
-  s.summary     = "Interact with the ALSA RawMIDI API in Ruby"
-  s.description = "A Ruby library for performing low level, realtime MIDI input and output in Linux.  Uses the ALSA RawMIDI driver interface API"
+  s.summary     = "Realtime MIDI input and output with Ruby for Linux."
+  s.description = "Perform low level, realtime MIDI input and output in Ruby for Linux using the ALSA RawMIDI driver interface API."
 
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "alsa-rawmidi"
 
   s.add_dependency "ffi", ">= 1.0"
 
-  s.files        = Dir.glob("{lib}/**/*") + %w(LICENSE README.org)
+  s.files        = Dir.glob("{lib}/**/*") + %w(LICENSE README.rdoc)
   s.require_path = 'lib'
 end
