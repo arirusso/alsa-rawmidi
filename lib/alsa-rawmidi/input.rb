@@ -3,7 +3,7 @@
 module AlsaRawMIDI
 	
   #
-  # Input device class for the ALSA driver interface
+  # Input device class
   #
   class Input
 
@@ -23,7 +23,6 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      output = []
       @listener.join
       msgs = @buffer.dup
       @buffer.clear
@@ -32,7 +31,7 @@ module AlsaRawMIDI
     end
     alias_method :read, :gets
 
-    # enable this the input device for use, can be passed a block
+    # enable this the input for use; can be passed a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(handle_ptr, nil, @id, Map::Constants[:SND_RAWMIDI_NONBLOCK])
@@ -52,11 +51,24 @@ module AlsaRawMIDI
     alias_method :open, :enable
     alias_method :start, :enable
 
-    # close the device and kill the listener thread
+    # close this input
     def close
       Thread.kill(@listener)
       Map.snd_rawmidi_drain(@handle)
       Map.snd_rawmidi_close(@handle)
+      @enabled = false
+    end
+    
+    def self.first
+      Device.first(:input)	
+    end
+
+    def self.last
+      Device.last(:input)	
+    end
+    
+    def self.all
+      Device.all_by_type[:input]
     end
 
     private
@@ -85,18 +97,6 @@ module AlsaRawMIDI
       end
       rawstr = buffer.get_bytes(0,Input::BufferSize)
       rawstr.eql?("") ? rawstr : rawstr.unpack("A*").first.unpack("H*").first.upcase
-    end
-    
-    def self.first
-      Device.first(:input)	
-    end
-
-    def self.last
-      Device.last(:input)	
-    end
-    
-    def self.all
-      Device.all_by_type[:input]
     end
     
   end

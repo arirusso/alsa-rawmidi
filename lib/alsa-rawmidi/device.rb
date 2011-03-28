@@ -27,12 +27,6 @@ module AlsaRawMIDI
       @enabled = false
     end
 
-    # close the device
-    def close
-      Map.snd_rawmidi_drain(@handle)
-      Map.snd_rawmidi_close(@handle)
-    end
-
     # select the first device of type <em>type</em>
     def self.first(type)
       all_by_type[type].first

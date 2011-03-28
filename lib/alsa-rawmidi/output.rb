@@ -3,13 +3,20 @@
 module AlsaRawMIDI
   
   #
-  # Output device class for the ALSA driver interface 
+  # Output device class
   #
   class Output
     
     include Device
     
-    # this takes a String of hex digits 
+    # close this output
+    def close
+      Map.snd_rawmidi_drain(@handle)
+      Map.snd_rawmidi_close(@handle)
+      @enabled = false
+    end
+    
+    # sends a MIDI message comprised of a String of hex digits 
     def puts_bytestr(data)
       data = data.dup
 	  output = []
@@ -19,7 +26,7 @@ module AlsaRawMIDI
       puts_bytes(*output)
     end
 
-    # sends a message consisting of Numeric bytes 
+    # sends a MIDI messages comprised of Numeric bytes 
     def puts_bytes(*data)
 
       format = "C" * data.size
@@ -30,7 +37,7 @@ module AlsaRawMIDI
       
     end
     
-    # send a message of an indeterminant type
+    # send a MIDI message of an indeterminant type
     def puts(*a)
   	  case a.first
         when Array then puts_bytes(*a.first)
@@ -40,7 +47,7 @@ module AlsaRawMIDI
     end
     alias_method :write, :puts
     
-    # enable this device, also takes a block
+    # enable this device; also takes a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(nil, handle_ptr, @id, 0)
@@ -56,7 +63,7 @@ module AlsaRawMIDI
     end
     alias_method :open, :enable
     alias_method :start, :enable
-
+    
     def self.first
       Device.first(:output)	
     end
@@ -68,7 +75,6 @@ module AlsaRawMIDI
     def self.all
       Device.all_by_type[:output]
     end
-    
   end
   
 end

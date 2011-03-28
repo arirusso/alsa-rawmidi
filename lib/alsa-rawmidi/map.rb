@@ -3,7 +3,7 @@
 module AlsaRawMIDI
 
   #
-  # ALSA driver interface library structs, enums and functions
+  # libasound RawMIDI struct, enum and function bindings
   #
   module Map
 
