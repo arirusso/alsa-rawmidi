@@ -30,6 +30,10 @@ Perform low level, realtime MIDI input and output in Ruby for Linux using the AL
 == Tests
 
 * please see {test/config.rb}[http://github.com/arirusso/alsa-rawmidi/blob/master/test/config.rb] before running tests
+
+== Documentation
+
+* {rdoc}[http://rdoc.info/gems/alsa-rawmidi]
 		
 == License
 

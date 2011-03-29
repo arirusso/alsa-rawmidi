@@ -14,22 +14,29 @@ module AlsaRawMIDI
     #
     # returns an array of MIDI event hashes as such:
     # [
-    #   { :data => "904040", :timestamp => 1024 },
-    #   { :data => "804040", :timestamp => 1100 },
-    #   { :data => "90607F", :timestamp => 1200 }
+    #   { :data => [144, 60, 100], :timestamp => 1024 },
+    #   { :data => [128, 60, 100], :timestamp => 1100 },
+    #   { :data => [144, 40, 120], :timestamp => 1200 }
     # ]
     #
-    # the data is strings of hex digits
+    # the data is an array of Numeric bytes
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
+      msgs = gets_bytestr
+      msgs.each { |msg| msg[:data] = message_to_hex(msg[:data]) } 
+      msgs	
+    end
+    alias_method :read, :gets
+    
+    # same as gets but returns message data as String of hex digits
+    def gets_bytestr
       @listener.join
       msgs = @buffer.dup
       @buffer.clear
       spawn_listener
       msgs
     end
-    alias_method :read, :gets
 
     # enable this the input for use; can be passed a block
     def enable(options = {}, &block)
@@ -82,7 +89,7 @@ module AlsaRawMIDI
     # launch a background thread that collects messages
     def spawn_listener
       @listener = Thread.fork do
-        while (raw = get_buffer).eql?("") do
+        while (raw = get_buffer).nil? do
           sleep(0.1)
         end
         @buffer << get_message_formatted(raw)
@@ -96,7 +103,19 @@ module AlsaRawMIDI
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
       rawstr = buffer.get_bytes(0,Input::BufferSize)
-      rawstr.eql?("") ? rawstr : rawstr.unpack("A*").first.unpack("H*").first.upcase
+      str = rawstr.unpack("A*").first.unpack("H*").first.upcase 
+      str.eql?("") ? nil : str
+    end
+    
+    private
+    
+    # convert byte str to byte array 
+    def message_to_hex(m)
+	  s = []
+	  until m.eql?("")
+	  	s << m.slice!(0, 2).hex
+	  end
+      s
     end
     
   end
