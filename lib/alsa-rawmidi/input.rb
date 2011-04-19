@@ -111,10 +111,10 @@ module AlsaRawMIDI
     
     # convert byte str to byte array 
     def message_to_hex(m)
-	  s = []
-	  until m.eql?("")
-	  	s << m.slice!(0, 2).hex
-	  end
+      s = []
+      until m.eql?("")
+	    s << m.slice!(0, 2).hex
+      end
       s
     end
     
