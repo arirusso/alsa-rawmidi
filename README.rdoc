@@ -1,17 +1,14 @@
 = alsa-rawmidi
 
-Author:: Ari Russo
-Copyright:: Copyright (c) 2010-2011 Ari Russo
-
 == Summary
 
 Perform low level, realtime MIDI input and output in Ruby for Linux using the ALSA RawMIDI driver interface API.  
 
 == Features
 
-* Full input and output
-* Handle all MIDI Message types (including SysEx)
-* Timestamped input messages
+* Input and output on multiple devices concurrently
+* Agnostically handle different MIDI Message types (including SysEx)
+* Timestamped input events
 
 == Requirements
 
@@ -35,6 +32,12 @@ Perform low level, realtime MIDI input and output in Ruby for Linux using the AL
 
 * {rdoc}[http://rdoc.info/gems/alsa-rawmidi]
 		
+== Author 
+
+{Ari Russo}[http://github.com/arirusso] _ari(dot)russo(at)gmail(dot)com_
+		
 == License
 
-Apache 2.0, See the file LICENSE  
+Apache 2.0, See the file LICENSE
+
+Copyright (c) 2010-2011 Ari Russo  
