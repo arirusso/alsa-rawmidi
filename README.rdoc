@@ -34,7 +34,7 @@ Perform low level, realtime MIDI input and output in Ruby for Linux using the AL
 		
 == Author 
 
-{Ari Russo}[http://github.com/arirusso] _ari(dot)russo(at)gmail(dot)com_
+{Ari Russo}[http://github.com/arirusso] <ari.russo at gmail.com>
 		
 == License
 
