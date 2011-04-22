@@ -2,7 +2,11 @@
 
 == Summary
 
-Perform low level, realtime MIDI input and output in Ruby for Linux using the ALSA RawMIDI driver interface API.  
+Perform low level realtime MIDI input and output in Ruby for Linux.  
+
+Uses the ALSA RawMIDI driver interface API.
+
+Please note: Unless you are creating linux-specific applications I highly recommend using {unimidi}[http://github.com/arirusso/unimidi] instead so that people on other platforms can use your code!  Unimidi is a platform independent wrapper that implements this library
 
 == Features
 
