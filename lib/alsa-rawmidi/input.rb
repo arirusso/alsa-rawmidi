@@ -29,7 +29,13 @@ module AlsaRawMIDI
     end
     alias_method :read, :gets
     
-    # same as gets but returns message data as String of hex digits
+    # same as gets but returns message data as string of hex digits as such:
+    # [ 
+    #   { :data => "904060", :timestamp => 904 },
+    #   { :data => "804060", :timestamp => 1150 },
+    #   { :data => "90447F", :timestamp => 1300 }
+    # ]
+    #
     def gets_bytestr
       @listener.join
       msgs = @buffer.dup
@@ -80,7 +86,7 @@ module AlsaRawMIDI
 
     private
 
-	# give a message its timestamp and package it in a Hash
+    # give a message its timestamp and package it in a Hash
     def get_message_formatted(raw)
       time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
       { :data => raw, :timestamp => time }
@@ -113,7 +119,7 @@ module AlsaRawMIDI
     def message_to_hex(m)
       s = []
       until m.eql?("")
-	    s << m.slice!(0, 2).hex
+        s << m.slice!(0, 2).hex
       end
       s
     end

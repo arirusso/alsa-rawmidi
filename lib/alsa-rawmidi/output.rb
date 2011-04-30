@@ -19,7 +19,7 @@ module AlsaRawMIDI
     # sends a MIDI message comprised of a String of hex digits 
     def puts_bytestr(data)
       data = data.dup
-	  output = []
+	    output = []
       until (str = data.slice!(0,2)).eql?("")
       	output << str.hex
       end
