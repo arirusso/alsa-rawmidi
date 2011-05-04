@@ -59,6 +59,8 @@ module AlsaRawMIDI
       	ensure
       		close
       	end
+      else
+        self
       end
     end
     alias_method :open, :enable
