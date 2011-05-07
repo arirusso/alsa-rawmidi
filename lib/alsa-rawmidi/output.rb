@@ -17,7 +17,7 @@ module AlsaRawMIDI
     end
     
     # sends a MIDI message comprised of a String of hex digits 
-    def puts_bytestr(data)
+    def puts_s(data)
       data = data.dup
 	    output = []
       until (str = data.slice!(0,2)).eql?("")
@@ -25,6 +25,8 @@ module AlsaRawMIDI
       end
       puts_bytes(*output)
     end
+    alias_method :puts_bytestr, :puts_s
+    alias_method :puts_hex, :puts_s
 
     # sends a MIDI messages comprised of Numeric bytes 
     def puts_bytes(*data)
@@ -41,8 +43,8 @@ module AlsaRawMIDI
     def puts(*a)
   	  case a.first
         when Array then puts_bytes(*a.first)
-    	when Numeric then puts_bytes(*a)
-    	when String then puts_bytestr(*a)
+    	  when Numeric then puts_bytes(*a)
+    	  when String then puts_s(*a)
       end
     end
     alias_method :write, :puts

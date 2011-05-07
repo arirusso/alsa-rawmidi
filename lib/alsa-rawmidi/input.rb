@@ -36,13 +36,15 @@ module AlsaRawMIDI
     #     { :data => "90447F", :timestamp => 1300 }
     #   ]
     #
-    def gets_bytestr
+    def gets_s
       @listener.join
       msgs = @buffer.dup
       @buffer.clear
       spawn_listener
       msgs
     end
+    alias_method :gets_bytestr, :gets_s
+    alias_method :gets_hex, :gets_s
 
     # enable this the input for use; can be passed a block
     def enable(options = {}, &block)
