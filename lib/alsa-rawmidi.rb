@@ -4,7 +4,7 @@
 # Set of modules and classes for interacting with the ALSA Driver Interface
 #
 module AlsaRawMIDI
-    VERSION = "0.2.4"
+    VERSION = "0.2.5"
 end
 
 require 'ffi'
