@@ -11,6 +11,8 @@ module AlsaRawMIDI
 
     BufferSize = 2048
     
+    attr_reader :buffer
+    
     #
     # returns an array of MIDI event hashes as such:
     #   [
@@ -24,7 +26,7 @@ module AlsaRawMIDI
     #
     def gets
       msgs = gets_bytestr
-      msgs.each { |msg| msg[:data] = message_to_hex(msg[:data]) } 
+      msgs.each { |msg| msg[:data] = hex_string_to_numeric_bytes(msg[:data]) } 
       msgs	
     end
     alias_method :read, :gets
@@ -38,8 +40,8 @@ module AlsaRawMIDI
     #
     def gets_s
       @listener.join
-      msgs = @buffer.dup
-      @buffer.clear
+      msgs = @internal_buffer.dup
+      @internal_buffer.clear
       spawn_listener
       msgs
     end
@@ -53,7 +55,7 @@ module AlsaRawMIDI
       @handle = handle_ptr.read_int
       @enabled = true
       @start_time = Time.now.to_f
-      @buffer = []
+      @buffer, @internal_buffer = [], []
       spawn_listener
       unless block.nil?
         begin
@@ -101,18 +103,20 @@ module AlsaRawMIDI
       @listener = Thread.fork do
         while (raw = get_buffer).nil? do
           sleep(0.1)
-        end
-        @buffer << get_message_formatted(raw)
+        end        
+        msg = get_message_formatted(raw)
+        @buffer << msg
+        @internal_buffer << msg
       end
     end
 
     # Get the next bytes from the buffer
     def get_buffer
-      buffer = FFI::MemoryPointer.new(:char, Input::BufferSize)
-      if (err = Map.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
+      b = FFI::MemoryPointer.new(:char, Input::BufferSize)
+      if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
-      rawstr = buffer.get_bytes(0,Input::BufferSize)
+      rawstr = b.get_bytes(0,Input::BufferSize)
       str = rawstr.unpack("A*").first.unpack("H*").first.upcase 
       str.eql?("") ? nil : str
     end
@@ -120,7 +124,7 @@ module AlsaRawMIDI
     private
     
     # convert byte str to byte array 
-    def message_to_hex(m)
+    def hex_string_to_numeric_bytes(m)
       s = []
       until m.eql?("")
         s << m.slice!(0, 2).hex
