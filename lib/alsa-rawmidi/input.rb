@@ -44,7 +44,7 @@ module AlsaRawMIDI
     #   ]
     #
     def gets_s
-      msgs = gets.dup
+      msgs = gets
       msgs.each { |m| m[:data] = numeric_bytes_to_hex_string(m[:data]) }
       msgs
     end
