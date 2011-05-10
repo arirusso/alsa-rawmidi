@@ -17,20 +17,17 @@ module AlsaRawMIDI
       :SND_RAWMIDI_NONBLOCK =>  0x0002,
       :SND_RAWMIDI_SYNC =>  0x0004
     }
-
-    module TypeAliases
-      SndCtlType = :ulong
-      SndCtl = :ulong
-      SndRawMIDI = :ulong
-    end
+    
+    typedef :ulong, :SndCtlType
+    typedef :ulong, :SndCtl
+    typedef :ulong, :SndRawMIDI
 
     # snd_ctl
     class SndCtl < FFI::Struct
-      include TypeAliases
 
       layout :dl_handle, :pointer, # void*
                 :name, :pointer, # char*
-                :type, SndCtlType,
+                :type, :SndCtlType,
                 :ops, :pointer, # const snd_ctl_ops_t*
                 :private_data, :pointer, # void*
                 :nonblock, :ulong,
@@ -184,28 +181,28 @@ module AlsaRawMIDI
     # Get card name from a CTL card info.
     attach_function :snd_ctl_card_info_get_name, [:pointer], :string # (const snd_ctl_card_info_t *obj) / const char*
     # Get info about a RawMidi device.
-    attach_function :snd_ctl_rawmidi_info, [TypeAliases::SndCtl, :pointer], :int # (snd_ctl_t *ctl, snd_rawmidi_info_t *info)
+    attach_function :snd_ctl_rawmidi_info, [:SndCtl, :pointer], :int # (snd_ctl_t *ctl, snd_rawmidi_info_t *info)
     # Get next RawMidi device number.
-    attach_function :snd_ctl_rawmidi_next_device, [TypeAliases::SndCtl, :pointer], :int # (snd_ctl_t *ctl, int *device)
+    attach_function :snd_ctl_rawmidi_next_device, [:SndCtl, :pointer], :int # (snd_ctl_t *ctl, int *device)
 
     #
     # snd_rawmidi
     #
 
     # close RawMidi handle
-    attach_function :snd_rawmidi_close, [TypeAliases::SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
+    attach_function :snd_rawmidi_close, [:SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
     # drain all bytes in the rawmidi I/O ring buffer
-    attach_function :snd_rawmidi_drain, [TypeAliases::SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
+    attach_function :snd_rawmidi_drain, [:SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
     # set nonblock mode
-    attach_function :snd_rawmidi_nonblock, [TypeAliases::SndRawMIDI, :int], :int # (snd_rawmidi_t *rmidi, int nonblock)
+    attach_function :snd_rawmidi_nonblock, [:SndRawMIDI, :int], :int # (snd_rawmidi_t *rmidi, int nonblock)
     # Opens a new connection to the RawMidi interface.
     attach_function :snd_rawmidi_open, [:pointer, :pointer, :string, :int], :int # (snd_rawmidi_t **in_rmidi, snd_rawmidi_t **out_rmidi, const char *name, int mode)
     # Opens a new connection to the RawMidi interface using local configuration.
     attach_function :snd_rawmidi_open_lconf, [:pointer, :pointer, :string, :int, :pointer], :int #(snd_rawmidi_t **in_rmidi, snd_rawmidi_t **out_rmidi, const char *name, int mode, snd_config_t *lconf)
     # read MIDI bytes from MIDI stream
-    attach_function :snd_rawmidi_read, [TypeAliases::SndRawMIDI, :pointer, :size_t], :ssize_t # (snd_rawmidi_t *rmidi, void *buffer, size_t size)
+    attach_function :snd_rawmidi_read, [:SndRawMIDI, :pointer, :size_t], :ssize_t # (snd_rawmidi_t *rmidi, void *buffer, size_t size)
     # write MIDI bytes to MIDI stream
-    attach_function :snd_rawmidi_write, [TypeAliases::SndRawMIDI, :ulong, :size_t], :ssize_t # (snd_rawmidi_t *rmidi, const void *buffer, size_t size)
+    attach_function :snd_rawmidi_write, [:SndRawMIDI, :ulong, :size_t], :ssize_t # (snd_rawmidi_t *rmidi, const void *buffer, size_t size)
 
     #
     # snd_rawmidi_info
