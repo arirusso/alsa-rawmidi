@@ -8,8 +8,9 @@ class IoTest < Test::Unit::TestCase
   include TestHelper
   include TestHelper::Config # before running these tests, adjust the constants in config.rb to suit your hardware setup
   # ** this test assumes that TestOutput is connected to TestInput
-  def test_full_io
 
+  def test_full_io
+    sleep(1)
     messages = VariousMIDIMessages
 
     TestOutput.open do |output|

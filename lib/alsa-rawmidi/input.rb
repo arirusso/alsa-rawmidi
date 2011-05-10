@@ -10,9 +10,7 @@ module AlsaRawMIDI
     include Device
 
     BufferSize = 2048
-    
-    attr_reader :buffer
-    
+        
     #
     # returns an array of MIDI event hashes as such:
     #   [
@@ -25,11 +23,16 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      msgs = gets_bytestr
+      msgs = gets_s
       msgs.each { |msg| msg[:data] = hex_string_to_numeric_bytes(msg[:data]) } 
       msgs	
     end
     alias_method :read, :gets
+    
+    def buffer
+      populate_local_buffers(poll_system_buffer)
+      @buffer
+    end
     
     # same as gets but returns message data as string of hex digits as such:
     #   [ 
@@ -93,25 +96,33 @@ module AlsaRawMIDI
     private
 
     # give a message its timestamp and package it in a Hash
-    def get_message_formatted(raw)
+    def get_message_formatted(raw, options = {})
       time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
-      { :data => raw, :timestamp => time }
+      data = options[:bytes] ? hex_string_to_numeric_bytes(raw) : raw
+      { :data => data, :timestamp => time }
     end
 
     # launch a background thread that collects messages
+    # and holds them for the next call to gets*
     def spawn_listener
       @listener = Thread.fork do
-        while (raw = get_buffer).nil? do
-          sleep(0.1)
-        end        
-        msg = get_message_formatted(raw)
-        @buffer << msg
-        @internal_buffer << msg
+        while (raw = poll_system_buffer).nil?
+          sleep(0.05)
+        end
+        populate_local_buffers(raw)
+      end
+    end
+    
+    # collect messages from the system buffer
+    def populate_local_buffers(msgs)
+      unless msgs.nil?
+        @buffer << get_message_formatted(msgs, :bytes => true)
+        @internal_buffer << get_message_formatted(msgs)
       end
     end
 
     # Get the next bytes from the buffer
-    def get_buffer
+    def poll_system_buffer
       b = FFI::MemoryPointer.new(:char, Input::BufferSize)
       if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
@@ -121,17 +132,19 @@ module AlsaRawMIDI
       str.eql?("") ? nil : str
     end
     
-    private
-    
     # convert byte str to byte array 
-    def hex_string_to_numeric_bytes(m)
-      s = []
-      until m.eql?("")
-        s << m.slice!(0, 2).hex
+    def hex_string_to_numeric_bytes(str)
+      str = str.dup
+      bytes = []
+      until str.eql?("")
+        bytes << str.slice!(0, 2).hex
       end
-      s
+      bytes
     end
-    
+
+    def numeric_bytes_to_hex_string(bytes)
+      bytes.map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join
+    end    
   end
 
 end
