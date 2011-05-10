@@ -23,14 +23,16 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      msgs = gets_s
-      msgs.each { |msg| msg[:data] = hex_string_to_numeric_bytes(msg[:data]) } 
-      msgs	
+      @listener.join
+      msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
+      @pointer += 1
+      spawn_listener
+      msgs
     end
     alias_method :read, :gets
     
     def buffer
-      populate_local_buffers(poll_system_buffer)
+      populate_local_buffer(poll_system_buffer)
       @buffer
     end
     
@@ -42,10 +44,8 @@ module AlsaRawMIDI
     #   ]
     #
     def gets_s
-      @listener.join
-      msgs = @internal_buffer.dup
-      @internal_buffer.clear
-      spawn_listener
+      msgs = gets.dup
+      msgs.each { |m| m[:data] = numeric_bytes_to_hex_string(m[:data]) }
       msgs
     end
     alias_method :gets_bytestr, :gets_s
@@ -58,7 +58,7 @@ module AlsaRawMIDI
       @handle = handle_ptr.read_int
       @enabled = true
       @start_time = Time.now.to_f
-      @buffer, @internal_buffer = [], []
+      initialize_buffer
       spawn_listener
       unless block.nil?
         begin
@@ -94,11 +94,20 @@ module AlsaRawMIDI
     end
 
     private
+    
+    def initialize_buffer
+      @pointer = 0
+      @buffer = []
+      def @buffer.clear 
+        @pointer = 0 
+        super
+      end
+    end
 
     # give a message its timestamp and package it in a Hash
     def get_message_formatted(raw, options = {})
       time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
-      data = options[:bytes] ? hex_string_to_numeric_bytes(raw) : raw
+      data = hex_string_to_numeric_bytes(raw)
       { :data => data, :timestamp => time }
     end
 
@@ -109,16 +118,13 @@ module AlsaRawMIDI
         while (raw = poll_system_buffer).nil?
           sleep(0.05)
         end
-        populate_local_buffers(raw)
+        populate_local_buffer(raw)
       end
     end
     
     # collect messages from the system buffer
-    def populate_local_buffers(msgs)
-      unless msgs.nil?
-        @buffer << get_message_formatted(msgs, :bytes => true)
-        @internal_buffer << get_message_formatted(msgs)
-      end
+    def populate_local_buffer(msgs)      
+      @buffer << get_message_formatted(msgs) unless msgs.nil?
     end
 
     # Get the next bytes from the buffer
