@@ -25,7 +25,7 @@ module AlsaRawMIDI
     def gets
       @listener.join
       msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
-      @pointer += 1
+      @pointer = @buffer.length
       spawn_listener
       msgs
     end
@@ -98,17 +98,16 @@ module AlsaRawMIDI
     def initialize_buffer
       @pointer = 0
       @buffer = []
-      def @buffer.clear 
-        @pointer = 0 
+      def @buffer.clear          
         super
+        @pointer = 0
       end
     end
 
     # give a message its timestamp and package it in a Hash
     def get_message_formatted(raw, options = {})
       time = ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
-      data = hex_string_to_numeric_bytes(raw)
-      { :data => data, :timestamp => time }
+      { :data => hex_string_to_numeric_bytes(raw), :timestamp => time }
     end
 
     # launch a background thread that collects messages
