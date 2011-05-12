@@ -115,7 +115,7 @@ module AlsaRawMIDI
     def spawn_listener
       @listener = Thread.fork do
         while (raw = poll_system_buffer).nil?
-          sleep(0.05)
+          sleep(1.0/128.0)
         end
         populate_local_buffer(raw)
       end
