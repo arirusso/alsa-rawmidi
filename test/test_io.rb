@@ -21,7 +21,7 @@ class IoTest < Test::Unit::TestCase
           $>.puts "sending: " + msg.inspect
 
           output.puts(msg)
-
+sleep(0.5)
           received = input.gets.first[:data]
           #received_ints = bytestrs_to_ints(received)
           $>.puts "received: " + received.inspect
@@ -57,7 +57,7 @@ class IoTest < Test::Unit::TestCase
           assert_equal(msg, received)
           
         end
-        
+   
         assert_equal(input.buffer.length, messages.length)
         
       end

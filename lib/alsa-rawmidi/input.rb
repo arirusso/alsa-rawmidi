@@ -9,7 +9,7 @@ module AlsaRawMIDI
 
     include Device
 
-    BufferSize = 2048
+    BufferSize = 256
         
     #
     # returns an array of MIDI event hashes as such:
@@ -114,8 +114,8 @@ module AlsaRawMIDI
     # and holds them for the next call to gets*
     def spawn_listener
       @listener = Thread.fork do
-        while (raw = poll_system_buffer).nil?
-          sleep(1.0/128.0)
+        while (raw = poll_system_buffer).eql?("")
+          #sleep(1.0/1024.0)
         end
         populate_local_buffer(raw)
       end
@@ -123,18 +123,19 @@ module AlsaRawMIDI
     
     # collect messages from the system buffer
     def populate_local_buffer(msgs)      
-      @buffer << get_message_formatted(msgs) unless msgs.nil?
+      @buffer << get_message_formatted(msgs) unless msgs.eql?("")
     end
 
     # Get the next bytes from the buffer
-    def poll_system_buffer
-      b = FFI::MemoryPointer.new(:char, Input::BufferSize)
+    def poll_system_buffer(delay = false)
+      sleep(1.0/500.0) if delay
+      b = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
       if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
       rawstr = b.get_bytes(0,Input::BufferSize)
       str = rawstr.unpack("A*").first.unpack("H*").first.upcase 
-      str.eql?("") ? nil : str
+      str.eql?("") ? "" : (str + poll_system_buffer(true))
     end
     
     # convert byte str to byte array 
