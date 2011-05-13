@@ -150,7 +150,8 @@ module AlsaRawMIDI
 
     def numeric_bytes_to_hex_string(bytes)
       bytes.map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join
-    end    
+    end
+        
   end
 
 end
