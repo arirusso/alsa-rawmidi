@@ -52,7 +52,7 @@ module AlsaRawMIDI
     # enable this device; also takes a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      Map.snd_rawmidi_open(nil, handle_ptr, @id, 0)
+      Map.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
       @handle = handle_ptr.read_int
       @enabled = true
       unless block.nil?

@@ -65,8 +65,8 @@ module AlsaRawMIDI
         end
 
         name = info[:name].to_s
-        id = get_alsa_subdev_id(card_num, device_num, subdev_count, i)
-        dev = dtype.new(id, :name => info[:name].to_s, :subname => info[:subname].to_s)
+        system_id = get_alsa_subdev_id(card_num, device_num, subdev_count, i)
+        dev = dtype.new(:system_id => system_id, :name => info[:name].to_s, :subname => info[:subname].to_s)
         available << dev
         i += 1
       end
