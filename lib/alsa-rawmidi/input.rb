@@ -25,20 +25,14 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      @report = true
-      @listener.join
-      @report = false
-      msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
+      request_queued_messages!
+      msgs = queued_messages
       @pointer = @buffer.length
-      spawn_listener
+      spawn_listener!
       msgs
     end
     alias_method :read, :gets
-    
-    #def buffer
-    #  @buffer
-    #end
-    
+        
     # same as gets but returns message data as string of hex digits as such:
     #   [ 
     #     { :data => "904060", :timestamp => 904 },
@@ -63,7 +57,7 @@ module AlsaRawMIDI
       @report = false
       @start_time = Time.now.to_f
       initialize_buffer
-      spawn_listener
+      spawn_listener!
       unless block.nil?
         begin
           block.call(self)
@@ -109,20 +103,39 @@ module AlsaRawMIDI
     end
     
     def now
-      ((Time.now.to_f - @start_time) * 1000).to_i # same time format as winmm
+      ((Time.now.to_f - @start_time) * 1000)
     end
 
     # give a message its timestamp and package it in a Hash
     def get_message_formatted(raw, time)
       { :data => hex_string_to_numeric_bytes(raw), :timestamp => time }
     end
+    
+    def queued_messages
+      @buffer.slice(@pointer, @buffer.length - @pointer)
+    end
+    
+    def queued_messages?
+      @pointer < @buffer.length
+    end
+    
+    def request_queued_messages!
+      @report = true
+      @listener.join      
+    end
+    
+    def queued_messages_requested?
+      queued_messages? && @report 
+    end
 
     # launch a background thread that collects messages
     # and holds them for the next call to gets*
-    def spawn_listener
-      @listener = Thread.fork do
-        while !@report
-          while (raw = poll_system_buffer).nil? && !@report
+    def spawn_listener!   
+      @report = false  
+      @listener = Thread.fork do       
+        until @report
+          while (raw = poll_system_buffer!).nil? && !queued_messages_requested?
+            sleep(1.0/1000)        
           end
           populate_local_buffer(raw) unless raw.nil?
         end
@@ -135,13 +148,13 @@ module AlsaRawMIDI
     end
 
     # Get the next bytes from the buffer
-    def poll_system_buffer
+    def poll_system_buffer!
       b = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
       if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
       rawstr = b.get_bytes(0,Input::BufferSize)
-      str = rawstr.unpack("A*").first.unpack("H*").first.upcase 
+      str = rawstr.unpack("A*").first.unpack("H*").first.upcase
       str.nil? || str.eql?("") ? nil : str
     end
     
