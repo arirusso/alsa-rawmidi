@@ -25,10 +25,10 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      request_queued_messages!
+      until queued_messages?
+      end
       msgs = queued_messages
       @pointer = @buffer.length
-      spawn_listener!
       msgs
     end
     alias_method :read, :gets
@@ -54,7 +54,6 @@ module AlsaRawMIDI
       Map.snd_rawmidi_open(handle_ptr, nil, @id, Map::Constants[:SND_RAWMIDI_NONBLOCK])
       @handle = handle_ptr.read_int
       @enabled = true
-      @report = false
       @start_time = Time.now.to_f
       initialize_buffer
       spawn_listener!
@@ -118,24 +117,13 @@ module AlsaRawMIDI
     def queued_messages?
       @pointer < @buffer.length
     end
-    
-    def request_queued_messages!
-      @report = true
-      @listener.join      
-    end
-    
-    def queued_messages_requested?
-      queued_messages? && @report 
-    end
 
     # launch a background thread that collects messages
     # and holds them for the next call to gets*
     def spawn_listener!   
-      @report = false  
       @listener = Thread.fork do       
-        until @report
-          while (raw = poll_system_buffer!).nil? && !queued_messages_requested?
-            sleep(1.0/1000)        
+        while true
+          while (raw = poll_system_buffer!).nil?
           end
           populate_local_buffer(raw) unless raw.nil?
         end
