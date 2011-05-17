@@ -192,8 +192,10 @@ module AlsaRawMIDI
     # close RawMidi handle
     attach_function :snd_rawmidi_close, [:SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
     # drain all bytes in the rawmidi I/O ring buffer
-    attach_function :snd_rawmidi_drain, [:SndRawMIDI], :int # (snd_rawmidi_t *rmidi)
-    # set nonblock mode
+    attach_function :snd_rawmidi_drain, [:SndRawMIDI], :int # (snd_rawmidi_t *rmidi)    
+    # drop all bytes in the rawmidi I/O ring buffer immediately
+    attach_function :snd_rawmidi_drop, [:SndRawMIDI], :int # int ( snd_rawmidi_t * rawmidi)
+    # set nonblock mode  
     attach_function :snd_rawmidi_nonblock, [:SndRawMIDI, :int], :int # (snd_rawmidi_t *rmidi, int nonblock)
     # Opens a new connection to the RawMidi interface.
     attach_function :snd_rawmidi_open, [:pointer, :pointer, :string, :int], :int # (snd_rawmidi_t **in_rmidi, snd_rawmidi_t **out_rmidi, const char *name, int mode)

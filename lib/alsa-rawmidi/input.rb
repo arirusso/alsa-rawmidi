@@ -59,7 +59,7 @@ module AlsaRawMIDI
       spawn_listener!
       unless block.nil?
         begin
-          block.call(self)
+          yield(self)
         ensure
           close
         end
@@ -120,10 +120,12 @@ module AlsaRawMIDI
 
     # launch a background thread that collects messages
     # and holds them for the next call to gets*
-    def spawn_listener!   
+    def spawn_listener!
+      t = 1.0/1000   
       @listener = Thread.fork do       
-        while true
+        loop do
           while (raw = poll_system_buffer!).nil?
+            sleep(t)
           end
           populate_local_buffer(raw) unless raw.nil?
         end
@@ -141,6 +143,7 @@ module AlsaRawMIDI
       if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
+      #Map.snd_rawmidi_drain(@handle)
       rawstr = b.get_bytes(0,Input::BufferSize)
       str = rawstr.unpack("A*").first.unpack("H*").first.upcase
       str.nil? || str.eql?("") ? nil : str

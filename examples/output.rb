@@ -15,7 +15,7 @@ duration = 0.1
 # or amidi -l from the command line
 
 AlsaRawMIDI::Output.first.open do |output|
-
+loop do
   (0..((octaves-1)*12)).step(12) do |oct|
 
     notes.each do |note|
@@ -23,9 +23,9 @@ AlsaRawMIDI::Output.first.open do |output|
       output.puts(0x90, note + oct, 100) # note on
       sleep(duration)				     # wait
       output.puts(0x80, note + oct, 100) # note off
-      
+      sleep(duration)
     end
     
   end
-
+end
 end
