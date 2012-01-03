@@ -25,8 +25,7 @@ module AlsaRawMIDI
     # the timestamp is the number of millis since this input was enabled
     #
     def gets
-      until queued_messages?
-      end
+      loop until queued_messages?
       msgs = queued_messages
       @pointer = @buffer.length
       msgs
