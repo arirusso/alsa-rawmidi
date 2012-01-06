@@ -143,9 +143,7 @@ module AlsaRawMIDI
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
       #Map.snd_rawmidi_drain(@handle)
-      rawstr = b.get_bytes(0,Input::BufferSize)
-      str = rawstr.unpack("A*").first.unpack("H*").first.upcase
-      str.nil? || str.eql?("") ? nil : str
+      if err > 0 then b.get_bytes(0,err).unpack("a*").first.unpack("H*").first.upcase else nil end
     end
     
     # convert byte str to byte array 
