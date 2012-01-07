@@ -138,12 +138,16 @@ module AlsaRawMIDI
 
     # Get the next bytes from the buffer
     def poll_system_buffer!
-      b = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
-      if (err = Map.snd_rawmidi_read(@handle, b, Input::BufferSize)) < 0
+      buffer = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
+      if (err = Map.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
       end
-      #Map.snd_rawmidi_drain(@handle)
-      if err > 0 then b.get_bytes(0,err).unpack("a*").first.unpack("H*").first.upcase else nil end
+      # Upon success, err is positive and equal to the number of bytes read
+      # into the buffer.
+      if err > 0
+        bytes = buffer.get_bytes(0,err).unpack("a*").first.unpack("H*")
+        bytes.first.upcase
+      end
     end
     
     # convert byte str to byte array 
