@@ -7,8 +7,8 @@ module AlsaRawMIDI
     
     # Close this output
     def close
-      Map.snd_rawmidi_drain(@handle)
-      Map.snd_rawmidi_close(@handle)
+      API.snd_rawmidi_drain(@handle)
+      API.snd_rawmidi_close(@handle)
       @enabled = false
     end
     
@@ -30,8 +30,8 @@ module AlsaRawMIDI
       format = "C" * data.size
       bytes = FFI::MemoryPointer.new(data.size).put_bytes(0, data.pack(format))
 
-      Map.snd_rawmidi_write(@handle, bytes.to_i, data.size)
-      Map.snd_rawmidi_drain(@handle)
+      API.snd_rawmidi_write(@handle, bytes.to_i, data.size)
+      API.snd_rawmidi_drain(@handle)
       
     end
     
@@ -48,7 +48,7 @@ module AlsaRawMIDI
     # Enable this device; also takes a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      Map.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
+      API.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
       @handle = handle_ptr.read_int
       @enabled = true
       unless block.nil?

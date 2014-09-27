@@ -46,7 +46,7 @@ module AlsaRawMIDI
     # Enable this the input for use; can be passed a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      Map.snd_rawmidi_open(handle_ptr, nil, @system_id, Map::Constants[:SND_RAWMIDI_NONBLOCK])
+      API.snd_rawmidi_open(handle_ptr, nil, @system_id, API::Constants[:SND_RAWMIDI_NONBLOCK])
       @handle = handle_ptr.read_int
       @enabled = true
       @start_time = Time.now.to_f
@@ -68,8 +68,8 @@ module AlsaRawMIDI
     # Close this input
     def close
       Thread.kill(@listener)
-      Map.snd_rawmidi_drain(@handle)
-      Map.snd_rawmidi_close(@handle)
+      API.snd_rawmidi_drain(@handle)
+      API.snd_rawmidi_close(@handle)
       @enabled = false
     end
     
@@ -138,8 +138,8 @@ module AlsaRawMIDI
     # Get the next bytes from the buffer
     def poll_system_buffer!
       buffer = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
-      if (err = Map.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
-        raise "Can't read MIDI input: #{Map.snd_strerror(err)}" unless err.eql?(-11)
+      if (err = API.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
+        raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
       end
       # Upon success, err is positive and equal to the number of bytes read
       # into the buffer.

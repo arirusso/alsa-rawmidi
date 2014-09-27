@@ -1,10 +1,10 @@
 module AlsaRawMIDI
 
   # libasound RawMIDI struct, enum and function bindings
-  module Map
+  module API
 
     extend FFI::Library
-    ffi_lib 'libasound'
+    ffi_lib "libasound"
 
     Constants = {
       :SND_RAWMIDI_STREAM_OUTPUT => 0,
@@ -13,81 +13,80 @@ module AlsaRawMIDI
       :SND_RAWMIDI_NONBLOCK =>  0x0002,
       :SND_RAWMIDI_SYNC =>  0x0004
     }
-    
+
     typedef :ulong, :SndCtlType
     typedef :ulong, :SndCtl
     typedef :ulong, :SndRawMIDI
 
     # snd_ctl
     class SndCtl < FFI::Struct
-
       layout :dl_handle, :pointer, # void*
-                :name, :pointer, # char*
-                :type, :SndCtlType,
-                :ops, :pointer, # const snd_ctl_ops_t*
-                :private_data, :pointer, # void*
-                :nonblock, :ulong,
-                :poll_fd, :ulong,
-                :async_handlers, :ulong
+        :name, :pointer, # char*
+        :type, :SndCtlType,
+        :ops, :pointer, # const snd_ctl_ops_t*
+        :private_data, :pointer, # void*
+        :nonblock, :ulong,
+        :poll_fd, :ulong,
+        :async_handlers, :ulong
     end
 
     # snd_ctl_card_info
     class SndCtlCardInfo < FFI::Struct
       layout :card, :int, # card number
-                 :pad, :int, # reserved for future (was type)
-                 :id, [:uchar, 16], # ID of card (user selectable)
-                 :driver, [:uchar, 16], # Driver name
-                 :name, [:uchar, 32], # Short name of soundcard
-                 :longname, [:uchar, 80], # name + info text about soundcard
-                 :reserved_, [:uchar, 16], # reserved for future (was ID of mixer)
-                 :mixername, [:uchar, 80], # visual mixer identification
-                 :components, [:uchar, 128] # card components / fine identification, delimited with one space (AC97 etc..)
+        :pad, :int, # reserved for future (was type)
+        :id, [:uchar, 16], # ID of card (user selectable)
+        :driver, [:uchar, 16], # Driver name
+        :name, [:uchar, 32], # Short name of soundcard
+        :longname, [:uchar, 80], # name + info text about soundcard
+        :reserved_, [:uchar, 16], # reserved for future (was ID of mixer)
+        :mixername, [:uchar, 80], # visual mixer identification
+        :components, [:uchar, 128] # card components / fine identification, delimited with one space (AC97 etc..)
     end
 
     # snd_rawmidi_info
     class SndRawMIDIInfo < FFI::Struct
       layout :device, :uint, # RO/WR (control): device number
-                :subdevice, :uint, # RO/WR (control): subdevice number
-                :stream, :int, # WR: stream
-                :card, :int, # R: card number
-                :flags, :uint, # SNDRV_RAWMIDI_INFO_XXXX
-                :id, [:uchar, 64], # ID (user selectable)
-                :name, [:uchar, 80], # name of device
-                :subname, [:uchar, 32], # name of active or selected subdevice
-                :subdevices_count, :uint,
-                :subdevices_avail, :uint,
-                :reserved, [:uchar, 64] # reserved for future use
+        :subdevice, :uint, # RO/WR (control): subdevice number
+        :stream, :int, # WR: stream
+        :card, :int, # R: card number
+        :flags, :uint, # SNDRV_RAWMIDI_INFO_XXXX
+        :id, [:uchar, 64], # ID (user selectable)
+        :name, [:uchar, 80], # name of device
+        :subname, [:uchar, 32], # name of active or selected subdevice
+        :subdevices_count, :uint,
+        :subdevices_avail, :uint,
+        :reserved, [:uchar, 64] # reserved for future use
     end
 
     # timespec
     class Timespec < FFI::Struct
       layout :tv_sec, :time_t, # Seconds since 00:00:00 GMT
-                 :tv_nsec, :long # Additional nanoseconds since
+        :tv_nsec, :long # Additional nanoseconds since
     end
 
     # snd_rawmidi_status
     class SndRawMIDIStatus < FFI::Struct
       layout :stream, :int,
-                 :timestamp, Timespec.by_value, # Timestamp
-                 :avail, :size_t, # available bytes
-                 :xruns, :size_t, # count of overruns since last status (in bytes)
-                 :reserved, [:uchar, 64] # reserved for future use
+        :timestamp, Timespec.by_value, # Timestamp
+        :avail, :size_t, # available bytes
+        :xruns, :size_t, # count of overruns since last status (in bytes)
+        :reserved, [:uchar, 64] # reserved for future use
     end
 
     # Simple doubly linked list implementation
     class LinkedList < FFI::Struct
       layout :next, :pointer, # *LinkedList
-                 :prev, :pointer # *LinkedList
+        :prev, :pointer # *LinkedList
     end
 
     # snd_rawmidi
     class SndRawMIDI < FFI::Struct
       layout :card, :pointer, # *snd_card
-                 :list, LinkedList.by_value,
-                 :device, :uint, # device number
-                 :info_flags, :uint, # SNDRV_RAWMIDI_INFO_XXXX
-                 :id, [:char, 64],
-                 :name, [:char, 80]
+        :list, LinkedList.by_value,
+        :device, :uint, # device number
+        :info_flags, :uint, # SNDRV_RAWMIDI_INFO_XXXX
+        :id, [:char, 64],
+        :name, [:char, 80]
     end
 
     # spinlock_t
@@ -98,7 +97,7 @@ module AlsaRawMIDI
     # wait_queue_head_t
     class WaitQueueHead < FFI::Struct
       layout :lock, Spinlock.by_value,
-                 :task_list, LinkedList.by_value
+        :task_list, LinkedList.by_value
     end
 
     class AtomicT < FFI::Struct
@@ -107,42 +106,42 @@ module AlsaRawMIDI
 
     class Tasklet < FFI::Struct
       layout :next, :pointer,   # pointer to the next tasklet in the list / void (*func) (unsigned long)
-                 :state, :ulong,    # state of the tasklet
-                 :count, AtomicT.by_value, # reference counter
-                 :func,  :pointer,  # tasklet handler function / void (*func) (unsigned long)
-                 :data,  :ulong     # argument to the tasklet function
+        :state, :ulong,    # state of the tasklet
+        :count, AtomicT.by_value, # reference counter
+        :func,  :pointer,  # tasklet handler function / void (*func) (unsigned long)
+        :data,  :ulong     # argument to the tasklet function
     end
 
     # snd_rawmidi_runtime
     class SndRawMIDIRuntime < FFI::Struct
       layout :drain, :uint, 1, # drain stage
-                 :oss, :uint, 1, # OSS compatible mode
-                 # midi stream buffer
-                 :buffer, :pointer, # uchar* / buffer for MIDI data
-                 :buffer_size, :size_t, # size of buffer
-                 :appl_ptr, :size_t, # application pointer
-                 :hw_ptr, :size_t, # hardware pointer
-                 :avail_min, :size_t, # min avail for wakeup
-                 :avail, :size_t, # max used buffer for wakeup
-                 :xruns, :size_t, # over/underruns counter
-                 # misc
-                 :lock, Spinlock.by_value,
-                 :sleep, WaitQueueHead.by_value,
-                 # event handler (new bytes, input only)
-                 :substream, :pointer, # void (*event)(struct snd_rawmidi_substream *substream);
-                 # defers calls to event [input] or ops->trigger [output]
-                 :tasklet, Tasklet.by_value,
-                 :private_data, :pointer, # void*
-                 :private_free, :pointer # void (*private_free)(struct snd_rawmidi_substream *substream)
+        :oss, :uint, 1, # OSS compatible mode
+        # midi stream buffer
+        :buffer, :pointer, # uchar* / buffer for MIDI data
+        :buffer_size, :size_t, # size of buffer
+        :appl_ptr, :size_t, # application pointer
+        :hw_ptr, :size_t, # hardware pointer
+        :avail_min, :size_t, # min avail for wakeup
+        :avail, :size_t, # max used buffer for wakeup
+        :xruns, :size_t, # over/underruns counter
+        # misc
+        :lock, Spinlock.by_value,
+        :sleep, WaitQueueHead.by_value,
+        # event handler (new bytes, input only)
+        :substream, :pointer, # void (*event)(struct snd_rawmidi_substream *substream);
+        # defers calls to event [input] or ops->trigger [output]
+        :tasklet, Tasklet.by_value,
+        :private_data, :pointer, # void*
+        :private_free, :pointer # void (*private_free)(struct snd_rawmidi_substream *substream)
     end
 
     # snd_rawmidi_params
     class SndRawMIDIParams < FFI::Struct
       layout :stream, :int,
-                 :buffer_size, :size_t, # queue size in bytes
-                 :avail_min, :size_t, # minimum avail bytes for wakeup
-                 :no_active_sensing, :uint, 1, # do not send active sensing byte in close()
-                 :reserved, [:uchar, 16] # reserved for future use
+        :buffer_size, :size_t, # queue size in bytes
+        :avail_min, :size_t, # minimum avail bytes for wakeup
+        :no_active_sensing, :uint, 1, # do not send active sensing byte in close()
+        :reserved, [:uchar, 16] # reserved for future use
     end
 
     #
@@ -207,10 +206,10 @@ module AlsaRawMIDI
     #
 
     enum :snd_rawmidi_stream, [
-              'SND_RAWMIDI_STREAM_OUTPUT', 0,
-              'SND_RAWMIDI_STREAM_INPUT', 1,
-              'SND_RAWMIDI_STREAM_LAST', 1
-        ]
+      "SND_RAWMIDI_STREAM_OUTPUT", 0,
+      "SND_RAWMIDI_STREAM_INPUT", 1,
+      "SND_RAWMIDI_STREAM_LAST", 1
+    ]
 
     # get information about RawMidi handle
     attach_function :snd_rawmidi_info, [:pointer, :pointer], :int # (snd_rawmidi_t *rmidi, snd_rawmidi_info_t *info)
