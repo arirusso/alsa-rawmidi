@@ -1,6 +1,8 @@
 # alsa-rawmidi
 
-Perform realtime MIDI input and output in Ruby for Linux.  Uses the ALSA RawMIDI driver interface API.
+#### Realtime MIDI IO with Ruby for Linux.
+
+Access the ALSA RawMIDI API from Ruby.
 
 Note that in the interest of allowing people on other platforms to utilize your code, you should consider using [unimidi](http://github.com/arirusso/unimidi).  Unimidi is a platform independent wrapper that implements this gem and has a similar API. 
 
