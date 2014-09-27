@@ -16,7 +16,7 @@ module AlsaRawMIDI
     def puts_s(data)
       data = data.dup
 	    output = []
-      until (str = data.slice!(0,2)).eql?("")
+      until (str = data.slice!(0,2)) == ""
       	output << str.hex
       end
       puts_bytes(*output)
@@ -51,7 +51,7 @@ module AlsaRawMIDI
       API.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
       @handle = handle_ptr.read_int
       @enabled = true
-      unless block.nil?
+      if block_given?
       	begin
       		yield(self)
       	ensure
