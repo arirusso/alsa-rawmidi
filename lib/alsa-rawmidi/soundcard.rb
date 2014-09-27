@@ -5,7 +5,22 @@ module AlsaRawMIDI
     attr_reader :subdevices
     
     def initialize(card_num)
-      @subdevices = { :input => [], :output => [] }
+      @subdevices = { 
+        :input => [], 
+        :output => [] 
+      }
+      populate(card_num)
+    end
+
+    def self.find(card_num)
+      if API.snd_card_load(card_num) == 1
+        Soundcard.new(card_num) 
+      end
+    end
+
+    private
+
+    def populate(card_num)
       name = "hw:#{card_num}"
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       #snd_ctl = API::SndCtl.new
@@ -15,22 +30,21 @@ module AlsaRawMIDI
       32.times do |i|
         devnum = FFI::MemoryPointer.new(:int).write_int(i)
         if (err = API.snd_ctl_rawmidi_next_device(handle, devnum)) < 0
-        break # fix this
+        break # TODO: fix this
         end
-        @subdevices.keys.each do |type|
-          populate_subdevices(type, handle, card_num, i)
+        @subdevices.each do |direction, collection|
+          card = {
+            :handle => handle,
+            :num => card_num,
+            :device_num => i
+          }
+          collection += populate_subdevices(direction, card)
         end
       end
     end
 
-    def self.find(card_num)
-      Soundcard.new(card_num) if API.snd_card_load(card_num).eql?(1)
-    end
-
-    private
-
     def unpack(string)
-      arr = string.delete_if { |n| n.zero? }
+      arr = string.delete_if(&:zero?)
       arr.pack("C#{arr.length}")
     end
 
@@ -39,36 +53,47 @@ module AlsaRawMIDI
       "hw:#{card_num},#{device_num}#{ext}"
     end
 
-    def populate_subdevices(type, ctl_ptr, card_num, device_num)
-      ctype, dtype = *case type
+    def populate_subdevices(direction, card)
+      stream_type, device_class = *case direction
       when :input then [API::CONSTANTS[:SND_RAWMIDI_STREAM_INPUT], Input]
       when :output then [API::CONSTANTS[:SND_RAWMIDI_STREAM_OUTPUT], Output]
       end
       info = API::SndRawMIDIInfo.new
       API.snd_rawmidi_info_set_device(info.pointer, device_num)
-      API.snd_rawmidi_info_set_stream(info.pointer, ctype)
+      API.snd_rawmidi_info_set_stream(info.pointer, stream_type)
       i = 0
       subdev_count = 1
-      available = []
+      devices = []
       while (i <= subdev_count)
-        API.snd_rawmidi_info_set_subdevice(info.pointer, i)
-        # fix this
-        if (err = API.snd_ctl_rawmidi_info(ctl_ptr, info.pointer)) < 0
-        break
-        end
-
-        if (i < 1)
-        subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
-        subdev_count = (subdev_count > 32) ? 0 : subdev_count
-        end
-
-        name = info[:name].to_s
-        system_id = get_alsa_subdev_id(card_num, device_num, subdev_count, i)
-        dev = dtype.new(:system_id => system_id, :name => info[:name].to_s, :subname => info[:subname].to_s)
-        available << dev
+        devices << get_subdevice(i, info, card[:handle], card[:num], card[:device_num])
         i += 1
       end
-      @subdevices[type] += available
+      devices
+    end
+
+    def get_subdevice(id, info, card)
+      API.snd_rawmidi_info_set_subdevice(info.pointer, id)
+      # TODO: fix this
+      if (err = API.snd_ctl_rawmidi_info(card[:handle], info.pointer)) < 0
+        break
+      end
+
+      if (id < 1)
+        subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
+        subdev_count = 0 if subdev_count > 32
+      end
+
+      create_device(id, subdev_count, info, card)
+    end
+
+    def create_device(id, subdev_count, info, card)
+      system_id = get_alsa_subdev_id(card[:num], card[:device_num], subdev_count, id)
+      device_options = {
+        :system_id => system_id, 
+        :name => info[:name].to_s, 
+        :subname => info[:subname].to_s
+      }
+      device_class.new(device_options)
     end
 
   end
