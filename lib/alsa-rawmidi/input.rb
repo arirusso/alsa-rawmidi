@@ -51,7 +51,7 @@ module AlsaRawMIDI
       @enabled = true
       @start_time = Time.now.to_f
       initialize_buffer
-      spawn_listener!
+      spawn_listener
       unless block.nil?
         begin
           yield(self)
@@ -118,11 +118,11 @@ module AlsaRawMIDI
 
     # launch a background thread that collects messages
     # and holds them for the next call to gets*
-    def spawn_listener!
+    def spawn_listener
       t = 1.0/1000   
       @listener = Thread.fork do       
         loop do
-          while (raw = poll_system_buffer!).nil?
+          while (raw = poll_system_buffer).nil?
             sleep(t)
           end
           populate_local_buffer(raw) unless raw.nil?
@@ -136,7 +136,7 @@ module AlsaRawMIDI
     end
 
     # Get the next bytes from the buffer
-    def poll_system_buffer!
+    def poll_system_buffer
       buffer = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
       if (err = API.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
         raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
