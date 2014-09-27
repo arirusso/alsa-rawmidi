@@ -1,16 +1,20 @@
-#!/usr/bin/env ruby
-
 #
-# Set of modules and classes for interacting with the ALSA Driver Interface
+# Modules and classes to interact with the ALSA Driver Interface
+#
+# Ari Russo
+# (c) 2010-2014
+# Licensed under Apache 2.0
 #
 module AlsaRawMIDI
-    VERSION = "0.2.15"
+  
+  VERSION = "0.2.15"
+
 end
 
-require 'ffi'
+require "ffi"
  
-require 'alsa-rawmidi/device'
-require 'alsa-rawmidi/input'
-require 'alsa-rawmidi/map'
-require 'alsa-rawmidi/output'
-require 'alsa-rawmidi/soundcard'
+require "alsa-rawmidi/device"
+require "alsa-rawmidi/input"
+require "alsa-rawmidi/map"
+require "alsa-rawmidi/output"
+require "alsa-rawmidi/soundcard"
