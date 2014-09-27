@@ -1,11 +1,6 @@
-#!/usr/bin/env ruby
-
 module AlsaRawMIDI
 
-  #
-  # Module containing methods used by both input and output devices when using the
-  # ALSA driver interface
-  #
+  # Common device functionality
   module Device
 
                 # has the device been initialized?
@@ -33,17 +28,17 @@ module AlsaRawMIDI
       @enabled = false
     end
 
-    # select the first device of type <em>type</em>
+    # Select the first device of the given type
     def self.first(type)
       all_by_type[type].first
     end
 
-    # select the last device of type <em>type</em>
+    # Select the last device of the given type
     def self.last(type)
       all_by_type[type].last
     end
 
-    # a Hash of :input and :output devices
+    # A hash of devices, partitioned by type
     def self.all_by_type
       available_devices = { :input => [], :output => [] }
       device_count = 0
@@ -63,7 +58,7 @@ module AlsaRawMIDI
       available_devices
     end
 
-    # all devices of both types
+    # All devices
     def self.all
       all_by_type.values.flatten
     end

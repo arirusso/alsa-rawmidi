@@ -1,22 +1,18 @@
-#!/usr/bin/env ruby
-
 module AlsaRawMIDI
   
-  #
   # Output device class
-  #
   class Output
     
     include Device
     
-    # close this output
+    # Close this output
     def close
       Map.snd_rawmidi_drain(@handle)
       Map.snd_rawmidi_close(@handle)
       @enabled = false
     end
     
-    # sends a MIDI message comprised of a String of hex digits 
+    # Send a MIDI message in hex string format
     def puts_s(data)
       data = data.dup
 	    output = []
@@ -28,7 +24,7 @@ module AlsaRawMIDI
     alias_method :puts_bytestr, :puts_s
     alias_method :puts_hex, :puts_s
 
-    # sends a MIDI messages comprised of Numeric bytes 
+    # Send a MIDI message in numeric byte format
     def puts_bytes(*data)
 
       format = "C" * data.size
@@ -39,7 +35,7 @@ module AlsaRawMIDI
       
     end
     
-    # send a MIDI message of an indeterminant type
+    # Send a MIDI message of an indeterminate type
     def puts(*a)
   	  case a.first
         when Array then puts_bytes(*a.first)
@@ -49,7 +45,7 @@ module AlsaRawMIDI
     end
     alias_method :write, :puts
     
-    # enable this device; also takes a block
+    # Enable this device; also takes a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
@@ -68,14 +64,17 @@ module AlsaRawMIDI
     alias_method :open, :enable
     alias_method :start, :enable
     
+    # The first output
     def self.first
       Device.first(:output)	
     end
 
+    # The last output
     def self.last
       Device.last(:output)	
     end
     
+    # All outputs
     def self.all
       Device.all_by_type[:output]
     end

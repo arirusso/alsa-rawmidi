@@ -1,10 +1,6 @@
-#!/usr/bin/env ruby
-
 module AlsaRawMIDI
 	
-  #
   # Input device class
-  #
   class Input
 
     include Device
@@ -14,15 +10,15 @@ module AlsaRawMIDI
     attr_reader :buffer
         
     #
-    # returns an array of MIDI event hashes as such:
+    # An array of MIDI event hashes as such:
     #   [
     #     { :data => [144, 60, 100], :timestamp => 1024 },
     #     { :data => [128, 60, 100], :timestamp => 1100 },
     #     { :data => [144, 40, 120], :timestamp => 1200 }
     #   ]
     #
-    # the data is an array of Numeric bytes
-    # the timestamp is the number of millis since this input was enabled
+    # The MIDI data is an array of Numeric bytes.
+    # The timestamp represents the number of millis since this input was enabled
     #
     def gets
       loop until queued_messages?
@@ -32,7 +28,7 @@ module AlsaRawMIDI
     end
     alias_method :read, :gets
         
-    # same as gets but returns message data as string of hex digits as such:
+    # Like Input#gets but returns message data as string of hex digits as such:
     #   [ 
     #     { :data => "904060", :timestamp => 904 },
     #     { :data => "804060", :timestamp => 1150 },
@@ -47,7 +43,7 @@ module AlsaRawMIDI
     alias_method :gets_bytestr, :gets_s
     alias_method :gets_hex, :gets_s
 
-    # enable this the input for use; can be passed a block
+    # Enable this the input for use; can be passed a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
       Map.snd_rawmidi_open(handle_ptr, nil, @system_id, Map::Constants[:SND_RAWMIDI_NONBLOCK])
@@ -69,7 +65,7 @@ module AlsaRawMIDI
     alias_method :open, :enable
     alias_method :start, :enable
 
-    # close this input
+    # Close this input
     def close
       Thread.kill(@listener)
       Map.snd_rawmidi_drain(@handle)
@@ -77,14 +73,17 @@ module AlsaRawMIDI
       @enabled = false
     end
     
+    # The first input
     def self.first
       Device.first(:input)	
     end
 
+    # The last input
     def self.last
       Device.last(:input)	
     end
     
+    # All inputs
     def self.all
       Device.all_by_type[:input]
     end
