@@ -1,8 +1,6 @@
 module AlsaRawMIDI
 
-  #
   # libasound RawMIDI struct, enum and function bindings
-  #
   module Map
 
     extend FFI::Library
