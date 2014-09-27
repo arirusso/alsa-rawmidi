@@ -27,6 +27,7 @@ AlsaRawMIDI::Output.first.open do |output|
         sleep(duration)				     # wait
         output.puts(0x80, note + oct, 100) # note off
         sleep(duration)
+
       end
 
     end
