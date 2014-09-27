@@ -52,7 +52,7 @@ module AlsaRawMIDI
       @start_time = Time.now.to_f
       initialize_buffer
       spawn_listener
-      unless block.nil?
+      if block_given?
         begin
           yield(self)
         ensure
@@ -145,7 +145,9 @@ module AlsaRawMIDI
     def poll_system_buffer
       buffer = FFI::MemoryPointer.new(:uint8, Input::BUFFER_SIZE)
       if (err = API.snd_rawmidi_read(@handle, buffer, Input::BUFFER_SIZE)) < 0
-        raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
+        unless err == -11
+          raise "Can't read MIDI input: #{API.snd_strerror(err)}"
+        end
       end
       # Upon success, err is positive and equal to the number of bytes read
       # into the buffer.
