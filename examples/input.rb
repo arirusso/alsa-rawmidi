@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
 dir = File.dirname(File.expand_path(__FILE__))
-$LOAD_PATH.unshift dir + '/../lib'
+$LOAD_PATH.unshift dir + "/../lib"
 
-require 'alsa-rawmidi'
+require "alsa-rawmidi"
 
-# this program selects the first midi input and sends an inspection of the first 10 messages
-# messages it receives to standard out
+# Selects the first MIDI input and prints the first 10 messages it receives to standard out
 
 num_messages = 10
 
@@ -15,13 +14,13 @@ num_messages = 10
 
 AlsaRawMIDI::Input.first.open do |input|
 
-  $>.puts "send some MIDI to your input now..."
+  puts "send some MIDI to your input now..."
 
   num_messages.times do
     m = input.gets
-    $>.puts(m)
+    puts(m)
   end
 
-  $>.puts "finished"
+  puts "finished"
 
 end
