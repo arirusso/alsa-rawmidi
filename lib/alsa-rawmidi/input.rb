@@ -100,12 +100,16 @@ module AlsaRawMIDI
     end
     
     def now
-      ((Time.now.to_f - @start_time) * 1000)
+      now = Time.now.to_f - @start_time
+      now * 1000
     end
 
     # give a message its timestamp and package it in a Hash
     def get_message_formatted(raw, time)
-      { :data => hex_string_to_numeric_bytes(raw), :timestamp => time }
+      { 
+        :data => hex_string_to_numeric_bytes(raw), 
+        :timestamp => time 
+      }
     end
     
     def queued_messages
@@ -119,20 +123,22 @@ module AlsaRawMIDI
     # launch a background thread that collects messages
     # and holds them for the next call to gets*
     def spawn_listener
-      t = 1.0/1000   
-      @listener = Thread.fork do       
+      interval = 1.0/1000   
+      @listener = Thread.new do  
         loop do
-          while (raw = poll_system_buffer).nil?
-            sleep(t)
+          while (data = poll_system_buffer).nil?
+            sleep(interval)
           end
-          populate_local_buffer(raw) unless raw.nil?
+          populate_local_buffer(data) unless data.nil?
         end
       end
     end
     
     # collect messages from the system buffer
-    def populate_local_buffer(msgs)      
-      @buffer << get_message_formatted(msgs, now) unless msgs.nil?
+    def populate_local_buffer(messages)      
+      unless messages.nil?
+        @buffer << get_message_formatted(message, now)
+      end
     end
 
     # Get the next bytes from the buffer
@@ -150,17 +156,23 @@ module AlsaRawMIDI
     end
     
     # convert byte str to byte array 
-    def hex_string_to_numeric_bytes(str)
-      str = str.dup
+    def hex_string_to_numeric_bytes(string)
+      string = string.dup
       bytes = []
-      until str.eql?("")
-        bytes << str.slice!(0, 2).hex
+      until string.length.zero?
+        string_byte = string.slice!(0, 2)
+        bytes << string_byte.hex
       end
       bytes
     end
 
     def numeric_bytes_to_hex_string(bytes)
-      bytes.map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join
+      string_bytes = bytes.map do |byte| 
+        string_byte = byte.to_s(16).upcase
+        string_byte = "0#{string_byte}" if byte < 16
+        string_byte
+      end
+      string_bytes.join
     end
         
   end
