@@ -59,7 +59,7 @@ module AlsaRawMIDI
       when :output then [API::CONSTANTS[:SND_RAWMIDI_STREAM_OUTPUT], Output]
       end
       info = API::SndRawMIDIInfo.new
-      API.snd_rawmidi_info_set_device(info.pointer, device_num)
+      API.snd_rawmidi_info_set_device(info.pointer, card[:device_num])
       API.snd_rawmidi_info_set_stream(info.pointer, stream_type)
       i = 0
       subdev_count = 1
