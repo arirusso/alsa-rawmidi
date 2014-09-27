@@ -5,7 +5,7 @@ module AlsaRawMIDI
 
     include Device
 
-    BufferSize = 256
+    BUFFER_SIZE = 256
     
     attr_reader :buffer
         
@@ -143,8 +143,8 @@ module AlsaRawMIDI
 
     # Get the next bytes from the buffer
     def poll_system_buffer
-      buffer = FFI::MemoryPointer.new(:uint8, Input::BufferSize)
-      if (err = API.snd_rawmidi_read(@handle, buffer, Input::BufferSize)) < 0
+      buffer = FFI::MemoryPointer.new(:uint8, Input::BUFFER_SIZE)
+      if (err = API.snd_rawmidi_read(@handle, buffer, Input::BUFFER_SIZE)) < 0
         raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
       end
       # Upon success, err is positive and equal to the number of bytes read
