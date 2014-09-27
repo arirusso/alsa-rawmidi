@@ -6,7 +6,7 @@ module AlsaRawMIDI
     extend FFI::Library
     ffi_lib "libasound"
 
-    Constants = {
+    CONSTANTS = {
       :SND_RAWMIDI_STREAM_OUTPUT => 0,
       :SND_RAWMIDI_STREAM_INPUT => 1,
       :SND_RAWMIDI_APPEND => 0x0001,

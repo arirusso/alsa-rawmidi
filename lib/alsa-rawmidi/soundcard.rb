@@ -41,8 +41,8 @@ module AlsaRawMIDI
 
     def populate_subdevices(type, ctl_ptr, card_num, device_num)
       ctype, dtype = *case type
-      when :input then [API::Constants[:SND_RAWMIDI_STREAM_INPUT], Input]
-      when :output then [API::Constants[:SND_RAWMIDI_STREAM_OUTPUT], Output]
+      when :input then [API::CONSTANTS[:SND_RAWMIDI_STREAM_INPUT], Input]
+      when :output then [API::CONSTANTS[:SND_RAWMIDI_STREAM_OUTPUT], Output]
       end
       info = API::SndRawMIDIInfo.new
       API.snd_rawmidi_info_set_device(info.pointer, device_num)

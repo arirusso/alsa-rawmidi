@@ -46,7 +46,7 @@ module AlsaRawMIDI
     # Enable this the input for use; can be passed a block
     def enable(options = {}, &block)
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      API.snd_rawmidi_open(handle_ptr, nil, @system_id, API::Constants[:SND_RAWMIDI_NONBLOCK])
+      API.snd_rawmidi_open(handle_ptr, nil, @system_id, API::CONSTANTS[:SND_RAWMIDI_NONBLOCK])
       @handle = handle_ptr.read_int
       @enabled = true
       @start_time = Time.now.to_f
