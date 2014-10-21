@@ -4,17 +4,21 @@
 # Ari Russo
 # (c) 2010-2014
 # Licensed under Apache 2.0
-#
+
+# libs
+require "ffi"
+ 
+# modules
+require "alsa-rawmidi/api"
+require "alsa-rawmidi/device"
+
+# class
+require "alsa-rawmidi/input"
+require "alsa-rawmidi/output"
+require "alsa-rawmidi/soundcard"
+
 module AlsaRawMIDI
   
   VERSION = "0.2.15"
 
 end
-
-require "ffi"
- 
-require "alsa-rawmidi/device"
-require "alsa-rawmidi/input"
-require "alsa-rawmidi/map"
-require "alsa-rawmidi/output"
-require "alsa-rawmidi/soundcard"
