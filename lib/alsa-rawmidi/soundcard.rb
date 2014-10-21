@@ -65,7 +65,7 @@ module AlsaRawMIDI
       subdev_count = 1
       devices = []
       while (i <= subdev_count)
-        device = get_subdevice(i, info, card[:handle], card[:num], card[:device_num])
+        device = get_subdevice(i, info, card)
         if device.nil?
           break
         else
