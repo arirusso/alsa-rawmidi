@@ -2,9 +2,13 @@ dir = File.dirname(File.expand_path(__FILE__))
 $LOAD_PATH.unshift dir + "/../lib"
 
 require "test/unit"
+require "mocha/test_unit"
+require "shoulda-context"
 require "alsa-rawmidi"
 
 module TestHelper
+
+  extend self
 
   def bytestrs_to_ints(arr)
     data = arr.map { |m| m[:data] }.join
