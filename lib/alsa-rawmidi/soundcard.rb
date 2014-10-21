@@ -65,7 +65,7 @@ module AlsaRawMIDI
       subdev_count = 1
       devices = []
       while (i <= subdev_count)
-        device = get_subdevice(i, info, card)
+        device = get_subdevice(device_class, i, info, card)
         if device.nil?
           break
         else
@@ -76,7 +76,7 @@ module AlsaRawMIDI
       devices
     end
 
-    def get_subdevice(id, info, card)
+    def get_subdevice(device_class, id, info, card)
       API.snd_rawmidi_info_set_subdevice(info.pointer, id)
       # TODO: fix this
       if (err = API.snd_ctl_rawmidi_info(card[:handle], info.pointer)) >= 0
@@ -86,11 +86,11 @@ module AlsaRawMIDI
           subdev_count = 0 if subdev_count > 32
         end
 
-        create_device(id, subdev_count, info, card)
+        create_device(device_class, id, subdev_count, info, card)
       end
     end
 
-    def create_device(id, subdev_count, info, card)
+    def create_device(device_class, id, subdev_count, info, card)
       system_id = get_alsa_subdev_id(card[:num], card[:device_num], subdev_count, id)
       device_options = {
         :system_id => system_id, 
