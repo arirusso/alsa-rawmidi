@@ -3,44 +3,6 @@ module AlsaRawMIDI
   # Common device functionality
   module Device
 
-    extend ClassMethods
-
-    # has the device been initialized?
-    attr_reader :enabled, 
-      # the alsa id of the device
-      :system_id,
-      # a unique numerical id for the device
-      :id, 
-      :name,
-      :subname,
-      # :input or :output
-      :type 
-
-    alias_method :enabled?, :enabled
-
-    def self.included(base)
-      base.send(:extend, ClassMethods)
-    end
-
-    def initialize(options = {}, &block)
-      @id = options[:id]
-      @name = options[:name]
-      @subname = options[:subname]
-      @system_id = options[:system_id]
-      @type = get_type
-      @enabled = false
-    end
-
-    private
-
-    def id=(id)
-      @id = id
-    end
-
-    def get_type
-      self.class.name.split('::').last.downcase.to_sym
-    end
-
     module ClassMethods
 
       # Select the first device of the given type
@@ -87,6 +49,44 @@ module AlsaRawMIDI
         available_devices
       end
 
+    end
+
+    extend ClassMethods
+
+    # has the device been initialized?
+    attr_reader :enabled, 
+      # the alsa id of the device
+      :system_id,
+      # a unique numerical id for the device
+      :id, 
+      :name,
+      :subname,
+      # :input or :output
+      :type 
+
+    alias_method :enabled?, :enabled
+
+    def self.included(base)
+      base.send(:extend, ClassMethods)
+    end
+
+    def initialize(options = {}, &block)
+      @id = options[:id]
+      @name = options[:name]
+      @subname = options[:subname]
+      @system_id = options[:system_id]
+      @type = get_type
+      @enabled = false
+    end
+
+    private
+
+    def id=(id)
+      @id = id
+    end
+
+    def get_type
+      self.class.name.split('::').last.downcase.to_sym
     end
 
   end
