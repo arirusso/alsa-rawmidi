@@ -3,6 +3,8 @@ module AlsaRawMIDI
   # Common device functionality
   module Device
 
+    extend ClassMethods
+
     # has the device been initialized?
     attr_reader :enabled, 
       # the alsa id of the device
