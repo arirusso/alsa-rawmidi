@@ -84,9 +84,8 @@ module AlsaRawMIDI
         if (id < 1)
           subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
           subdev_count = 0 if subdev_count > 32
+          create_device(device_class, id, subdev_count, info, card)
         end
-
-        create_device(device_class, id, subdev_count, info, card)
       end
     end
 
