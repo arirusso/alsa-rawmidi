@@ -16,7 +16,7 @@ module TestHelper
     until (bytestr = data.slice!(0,2)).eql?("")
       output << bytestr.hex
     end
-    output    	
+    output
   end
 
   # some MIDI messages
@@ -41,11 +41,11 @@ module TestHelper
   end
 
   def input
-    Input.first
+    AlsaRawMIDI::Input.first
   end
 
   def output
-    Output.first
+    AlsaRawMIDI::Output.first
   end
 
 end

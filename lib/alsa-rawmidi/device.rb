@@ -70,7 +70,7 @@ module AlsaRawMIDI
       base.send(:extend, ClassMethods)
     end
 
-    def initialize(options = {}, &block)
+    def initialize(options = {})
       @id = options[:id]
       @name = options[:name]
       @subname = options[:subname]

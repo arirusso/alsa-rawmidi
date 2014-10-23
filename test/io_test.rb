@@ -6,15 +6,11 @@ class AlsaRawMIDI::IoTest < Test::Unit::TestCase
   context "AlsaRawMIDI" do
 
     setup do
+      sleep(1)
       @input = TestHelper.input.open
       @output = TestHelper.output.open
       @input.buffer.clear
       @pointer = 0
-    end
-
-    teardown do
-      @input.close
-      @output.close
     end
 
     context "full IO" do
@@ -26,7 +22,10 @@ class AlsaRawMIDI::IoTest < Test::Unit::TestCase
           @messages_arr = @messages.inject(&:+).flatten
           @received_arr = []
         end
-
+teardown do
+  @input.close
+  @output.close
+end
         should "do IO" do
           @messages.each do |message|
 
