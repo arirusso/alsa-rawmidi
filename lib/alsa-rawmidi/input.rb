@@ -9,17 +9,18 @@ module AlsaRawMIDI
 
 		attr_reader :buffer
 
-		#
-		# An array of MIDI event hashes as such:
-		#   [
-		#     { :data => [144, 60, 100], :timestamp => 1024 },
-		#     { :data => [128, 60, 100], :timestamp => 1100 },
-		#     { :data => [144, 40, 120], :timestamp => 1200 }
-		#   ]
-		#
-		# The MIDI data is an array of Numeric bytes.
-		# The timestamp represents the number of millis since this input was enabled
-		#
+    #
+    # An array of MIDI event hashes as such:
+    # [
+    #   { :data => [144, 60, 100], :timestamp => 1024 },
+    #   { :data => [128, 60, 100], :timestamp => 1100 },
+    #   { :data => [144, 40, 120], :timestamp => 1200 }
+    # ]
+    #
+    # The data is an array of numeric bytes
+    # The timestamp is the number of millis since this input was enabled
+    #
+    # @return [Array<Hash>]
 		def gets
 			loop until enqueued_messages?
 			msgs = enqueued_messages
@@ -35,6 +36,7 @@ module AlsaRawMIDI
 		#     { :data => "90447F", :timestamp => 1300 }
 		#   ]
 		#
+		# @return [Array<Hash>]
 		def gets_s
 			msgs = gets
 			msgs.each { |m| m[:data] = numeric_bytes_to_hex_string(m[:data]) }
@@ -43,7 +45,10 @@ module AlsaRawMIDI
 		alias_method :gets_bytestr, :gets_s
 		alias_method :gets_hex, :gets_s
 
-		# Enable this the input for use; can be passed a block
+		# Enable this the input for use; yields
+		# @param [Hash] options
+    # @param [Proc] block
+    # @return [Input] self
 		def enable(options = {}, &block)
 			unless @enabled
 				@start_time = Time.now.to_f
@@ -74,6 +79,9 @@ module AlsaRawMIDI
 			  API.snd_rawmidi_drain(@handle)
 			  API.snd_rawmidi_close(@handle)
 			  @enabled = false
+				true
+		  else
+				false
 		  end
 		end
 
@@ -161,11 +169,13 @@ module AlsaRawMIDI
 		end
 
 		# Collect messages from the system buffer
+		# @return [Array<String>, nil]
 		def populate_local_buffer(messages)
 			@buffer << get_message_formatted(messages, now) unless messages.nil?
 		end
 
 		# Get the next bytes from the buffer
+		# @return [String]
 		def poll_system_buffer
 			buffer = FFI::MemoryPointer.new(:uint8, BUFFER_SIZE)
 			if (err = API.snd_rawmidi_read(@handle, buffer, BUFFER_SIZE)) < 0
@@ -179,7 +189,9 @@ module AlsaRawMIDI
 			end
 		end
 
-		# convert byte str to byte array
+		# Convert a hex string to an array of numeric bytes eg "904040" -> [0x90, 0x40, 0x40]
+		# @param [String] string
+		# @return [Array<Fixnum>]
 		def hex_string_to_numeric_bytes(string)
 			string = string.dup
 			bytes = []
@@ -190,6 +202,9 @@ module AlsaRawMIDI
 			bytes
 		end
 
+    # Convert an array of numeric bytes to a hex string eg [0x90, 0x40, 0x40] -> "904040"
+    # @param [Array<Fixnum>] bytes
+    # @return [String]
 		def numeric_bytes_to_hex_string(bytes)
 			string_bytes = bytes.map do |byte|
 				string_byte = byte.to_s(16).upcase

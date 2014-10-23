@@ -6,15 +6,21 @@ module AlsaRawMIDI
     include Device
 
     # Close this output
+    # @return [Boolean]
     def close
       if @enabled
         API.snd_rawmidi_drain(@handle)
         API.snd_rawmidi_close(@handle)
         @enabled = false
+        true
+      else
+        false
       end
     end
 
-    # Send a MIDI message in hex string format
+    # Output a MIDI message in hex string format
+    # @param [String] data
+    # @return [Boolean]
     def puts_s(data)
       data = data.dup
       output = []
@@ -22,11 +28,14 @@ module AlsaRawMIDI
         output << str.hex
       end
       puts_bytes(*output)
+      true
     end
     alias_method :puts_bytestr, :puts_s
     alias_method :puts_hex, :puts_s
 
-    # Send a MIDI message in numeric byte format
+    # Output a MIDI message in numeric byte format
+    # @param [*Fixnum] data
+    # @return [Boolean]
     def puts_bytes(*data)
 
       format = "C" * data.size
@@ -34,20 +43,25 @@ module AlsaRawMIDI
 
       API.snd_rawmidi_write(@handle, bytes.to_i, data.size)
       API.snd_rawmidi_drain(@handle)
-
+      true
     end
 
-    # Send a MIDI message of an indeterminate type
-    def puts(*a)
-      case a.first
-      when Array then puts_bytes(*a.first)
-      when Numeric then puts_bytes(*a)
-      when String then puts_s(*a)
+    # Output the given MIDI message
+    # @param [*Fixnum, *String] args
+    # @return [Boolean]
+    def puts(*args)
+      case args.first
+        when Array then args.each { |arg| puts(*arg) }
+        when Numeric then puts_bytes(*args)
+        when String then puts_bytestr(*args)
       end
     end
     alias_method :write, :puts
 
-    # Enable this device; also takes a block
+    # Enable this device; yields
+    # @param [Hash] options
+    # @param [Proc] block
+    # @return [Output]
     def enable(options = {}, &block)
       unless @enabled
         handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
@@ -67,20 +81,24 @@ module AlsaRawMIDI
     alias_method :open, :enable
     alias_method :start, :enable
 
-    # The first output
+    # The first available output
+    # @return [Output]
     def self.first
       Device.first(:output)
     end
 
-    # The last output
+    # The last available output
+    # @return [Output]
     def self.last
       Device.last(:output)
     end
 
     # All outputs
+    # @return [Array<Output>]
     def self.all
       Device.all_by_type[:output]
     end
+    
   end
 
 end
