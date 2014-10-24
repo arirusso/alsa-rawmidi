@@ -9,65 +9,81 @@ module AlsaRawMIDI
         :input => [],
         :output => []
       }
-      populate_subdevices(card_num)
+      @id = card_num
+      @pointer = get_handle
+      populate_subdevices
     end
 
     def self.find(card_num)
-      Soundcard.new(card_num) if API.snd_card_load(card_num).eql?(1)
+      @soundcards ||= {}
+      if API.snd_card_load(card_num).eql?(1)
+        @soundcards[card_num] ||= Soundcard.new(card_num)
+      end
     end
 
     private
 
-    def get_handle(card_num)
-      pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
-      API.snd_ctl_open(pointer, get_alsa_card_name(card_num), 0)
-      pointer.read_int
+    def get_handle
+      handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
+      API.snd_ctl_open(handle_pointer, get_alsa_card_name, 0)
+      handle_pointer.read_int
     end
 
-    def populate_subdevices(card_num)
-      handle = get_handle(card_num)
-      ids = (0..31).to_a.select do |i|
-        devnum = FFI::MemoryPointer.new(:int).write_int(i)
-        API.snd_ctl_rawmidi_next_device(handle, devnum) >= 0
+    def get_subdevice_ids
+      (0..31).to_a.select do |n|
+        device_id = FFI::MemoryPointer.new(:int).write_int(n)
+        API.snd_ctl_rawmidi_next_device(@pointer, device_id) >= 0
       end
+    end
+
+    def populate_subdevices
+      ids = get_subdevice_ids
       ids.each do |id|
         @subdevices.keys.each do |direction|
-          @subdevices[direction] += get_subdevice(direction, handle, card_num, id)
+          devices = get_subdevices(direction, id) do |device_hash|
+            new_device(device_hash)
+          end
+          @subdevices[direction] += devices
         end
       end
     end
 
     def unpack(string)
-      arr = string.delete_if { |n| n.zero? }
+      arr = string.delete_if(&:zero?)
       arr.pack("C#{arr.length}")
     end
 
-    # @param [Fixnum, String] num
     # @return [String]
-    def get_alsa_card_name(num)
-      "hw:#{num.to_s}"
+    def get_alsa_card_name
+      "hw:#{@id.to_s}"
     end
 
-    # @param [Fixnum, String] card_num
     # @param [Fixnum, String] device_num
     # @param [Fixnum] subdev_count
     # @param [Fixnum] id
     # @return [String]
-    def get_alsa_subdev_id(card_num, device_num, subdev_count, id)
+    def get_alsa_subdev_id(device_id, subdev_count, id)
       ext = (subdev_count > 1) ? ",#{id}" : ''
-      "#{get_alsa_card_name(card_num)},#{device_num.to_s}#{ext}"
+      "#{get_alsa_card_name},#{device_id.to_s}#{ext}"
     end
 
-    def get_subdevice(direction, ctl_ptr, card_num, device_num)
-      info = get_info(direction, device_num)
+    def get_subdevices(direction, device_id, &block)
+      info = get_info(direction, device_id)
       i = 0
       subdev_count = 1
       available = []
       while i <= subdev_count
         API.snd_rawmidi_info_set_subdevice(info.pointer, i)
-        if API.snd_ctl_rawmidi_info(ctl_ptr, info.pointer) >= 0
+        if API.snd_ctl_rawmidi_info(@pointer, info.pointer) >= 0
           subdev_count = get_subdev_count(info) if i.zero?
-          available << new_device(direction, info, card_num, device_num, subdev_count, i)
+          device_hash = {
+            :direction => direction,
+            :id => i,
+            :info => info,
+            :device_id => device_id,
+            :subdev_count => subdev_count
+          }
+          available << yield(device_hash)
           i += 1
         else
           break
@@ -95,13 +111,15 @@ module AlsaRawMIDI
     end
 
     # Instantiate a new device object
+    # @param [Hash]
     # @return [Input, Output]
-    def new_device(direction, info, card_num, device_num, subdev_count, id)
-      system_id = get_alsa_subdev_id(card_num, device_num, subdev_count, id)
-      device_class = case direction
+    def new_device(device_hash)
+      device_class = case device_hash[:direction]
       when :input then Input
       when :output then Output
       end
+      system_id = get_alsa_subdev_id(device_hash[:device_id], device_hash[:subdev_count], device_hash[:id])
+      info = device_hash[:info]
       device_class.new(:system_id => system_id, :name => info[:name].to_s, :subname => info[:subname].to_s)
     end
 
