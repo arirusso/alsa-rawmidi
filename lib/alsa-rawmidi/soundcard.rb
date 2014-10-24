@@ -16,9 +16,8 @@ module AlsaRawMIDI
     private
 
     def populate_subdevices(card_num)
-      name = "hw:#{card_num}"
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      API.snd_ctl_open(handle_ptr, name, 0)
+      API.snd_ctl_open(handle_ptr, get_alsa_card_name(card_num), 0)
       handle = handle_ptr.read_int
       ids = (0..31).to_a.select do |i|
         devnum = FFI::MemoryPointer.new(:int).write_int(i)
@@ -36,9 +35,20 @@ module AlsaRawMIDI
       arr.pack("C#{arr.length}")
     end
 
-    def get_alsa_subdev_id(card_num, device_num, subdev_count, i)
-      ext = (subdev_count > 1) ? ",#{i}" : ''
-      "hw:#{card_num},#{device_num}#{ext}"
+    # @param [Fixnum, String] num
+    # @return [String]
+    def get_alsa_card_name(num)
+      "hw:#{num.to_s}"
+    end
+
+    # @param [Fixnum, String] card_num
+    # @param [Fixnum, String] device_num
+    # @param [Fixnum] subdev_count
+    # @param [Fixnum] id
+    # @return [String]
+    def get_alsa_subdev_id(card_num, device_num, subdev_count, id)
+      ext = (subdev_count > 1) ? ",#{id}" : ''
+      "#{get_alsa_card_name(card_num)},#{device_num.to_s}#{ext}"
     end
 
     def populate_subdevice(direction, ctl_ptr, card_num, device_num)
