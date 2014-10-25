@@ -279,6 +279,35 @@ module AlsaRawMIDI
         info
       end
 
+      # @param [Fixnum] soundcard_id
+      # @param [Fixnum] device_id
+      # @param [Symbol] direction
+      # @param [Proc] block
+      # @return [Array<Object>]
+      def get_subdevices(direction, soundcard_id, device_id, &block)
+        info = API::Soundcard.get_info(direction, device_id)
+        handle = API::Soundcard.get_handle(soundcard_id)
+        i = 0
+        subdev_count = 1
+        available = []
+        while i <= subdev_count
+          if API::Soundcard.valid_subdevice?(info, i, handle)
+            subdev_count = API::Soundcard.get_subdevice_count(info) if i.zero?
+            system_id = API::Soundcard.get_subdevice_id(soundcard_id, device_id, subdev_count, i)
+            device_hash = {
+              :id => system_id,
+              :name => info[:name].to_s,
+              :subname => info[:subname].to_s
+            }
+            available << yield(device_hash)
+            i += 1
+          else
+            break
+          end
+        end
+        available
+      end
+
       # @param [Fixnum] id
       # @return [Array<Fixnum>]
       def get_device_ids(id)
