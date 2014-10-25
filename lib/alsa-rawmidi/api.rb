@@ -246,6 +246,16 @@ module AlsaRawMIDI
       end
 
       # @param [Fixnum] id
+      # @return [Array<Fixnum>]
+      def get_subdevice_ids(id)
+        handle = API::Soundcard.get_handle(id)
+        (0..31).to_a.select do |n|
+          device_id = FFI::MemoryPointer.new(:int).write_int(n)
+          API.snd_ctl_rawmidi_next_device(handle, device_id) >= 0
+        end
+      end
+
+      # @param [Fixnum] id
       # @return [String]
       def get_name(id)
         "hw:#{id.to_s}"

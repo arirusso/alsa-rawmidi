@@ -10,7 +10,6 @@ module AlsaRawMIDI
         :output => []
       }
       @id = card_num
-      @pointer = API::Soundcard.get_handle(@id)
       populate_subdevices
     end
 
@@ -23,15 +22,8 @@ module AlsaRawMIDI
 
     private
 
-    def get_subdevice_ids
-      (0..31).to_a.select do |n|
-        device_id = FFI::MemoryPointer.new(:int).write_int(n)
-        API.snd_ctl_rawmidi_next_device(@pointer, device_id) >= 0
-      end
-    end
-
     def populate_subdevices
-      ids = get_subdevice_ids
+      ids = API::Soundcard.get_subdevice_ids(@id)
       ids.each do |id|
         @subdevices.keys.each do |direction|
           devices = get_subdevices(direction, id) do |device_hash|
@@ -59,12 +51,13 @@ module AlsaRawMIDI
 
     def get_subdevices(direction, device_id, &block)
       info = get_info(direction, device_id)
+      handle = API::Soundcard.get_handle(@id)
       i = 0
       subdev_count = 1
       available = []
       while i <= subdev_count
         API.snd_rawmidi_info_set_subdevice(info.pointer, i)
-        if API.snd_ctl_rawmidi_info(@pointer, info.pointer) >= 0
+        if API.snd_ctl_rawmidi_info(handle, info.pointer) >= 0
           subdev_count = API::Soundcard.get_subdevice_count(info) if i.zero?
           device_hash = {
             :direction => direction,
