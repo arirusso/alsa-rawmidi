@@ -236,6 +236,8 @@ module AlsaRawMIDI
     # Wrapper for ALSA methods dealing with input
     module Input
 
+      BUFFER_SIZE = 256
+
       extend self
 
       # Open the output with the given ID
@@ -244,6 +246,21 @@ module AlsaRawMIDI
       def open(id)
         API::Device.open(id) do |pointer|
           API.snd_rawmidi_open(pointer, nil, id,  API::CONSTANTS[:SND_RAWMIDI_NONBLOCK])
+        end
+      end
+
+      # Get the next bytes from the buffer
+      # @return [String]
+      def poll_system_buffer(handle)
+        buffer = FFI::MemoryPointer.new(:uint8, BUFFER_SIZE)
+        if (err = API.snd_rawmidi_read(handle, buffer, BUFFER_SIZE)) < 0
+          raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
+        end
+        # Upon success, err is positive and equal to the number of bytes read
+        # into the buffer.
+        if err > 0
+          bytes = buffer.get_bytes(0,err).unpack("a*").first.unpack("H*")
+          bytes.first.upcase
         end
       end
 

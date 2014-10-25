@@ -5,8 +5,6 @@ module AlsaRawMIDI
 
     include Device
 
-    BUFFER_SIZE = 256
-
     attr_reader :buffer
 
     #
@@ -152,7 +150,7 @@ module AlsaRawMIDI
       @listener = Thread.new do
         begin
           loop do
-            while (messages = poll_system_buffer).nil?
+            while (messages = API::Input.poll_system_buffer(@handle)).nil?
               sleep(interval)
             end
             populate_local_buffer(messages) unless messages.nil?
@@ -169,21 +167,6 @@ module AlsaRawMIDI
     # @return [Array<String>, nil]
     def populate_local_buffer(messages)
       @buffer << get_message_formatted(messages, now) unless messages.nil?
-    end
-
-    # Get the next bytes from the buffer
-    # @return [String]
-    def poll_system_buffer
-      buffer = FFI::MemoryPointer.new(:uint8, BUFFER_SIZE)
-      if (err = API.snd_rawmidi_read(@handle, buffer, BUFFER_SIZE)) < 0
-        raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
-      end
-      # Upon success, err is positive and equal to the number of bytes read
-      # into the buffer.
-      if err > 0
-        bytes = buffer.get_bytes(0,err).unpack("a*").first.unpack("H*")
-        bytes.first.upcase
-      end
     end
 
     # Convert a hex string to an array of numeric bytes eg "904040" -> [0x90, 0x40, 0x40]
