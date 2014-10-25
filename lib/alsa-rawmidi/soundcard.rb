@@ -44,10 +44,11 @@ module AlsaRawMIDI
         if API::Soundcard.valid_subdevice?(info, i, handle)
           subdev_count = API::Soundcard.get_subdevice_count(info) if i.zero?
           device_hash = {
+            :device_id => device_id,
             :direction => direction,
             :id => i,
-            :info => info,
-            :device_id => device_id,
+            :name => info[:name].to_s,
+            :subname => info[:subname].to_s,
             :subdev_count => subdev_count
           }
           available << yield(device_hash)
@@ -68,8 +69,7 @@ module AlsaRawMIDI
       when :output then Output
       end
       system_id = API::Soundcard.get_subdevice_id(@id, device_hash[:device_id], device_hash[:subdev_count], device_hash[:id])
-      info = device_hash[:info]
-      device_class.new(:system_id => system_id, :name => info[:name].to_s, :subname => info[:subname].to_s)
+      device_class.new(:system_id => system_id, :name => device_hash[:name], :subname => device_hash[:subname])
     end
 
   end
