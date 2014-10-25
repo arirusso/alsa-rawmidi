@@ -3,6 +3,8 @@
 dir = File.dirname(File.expand_path(__FILE__))
 $LOAD_PATH.unshift dir + "/../lib"
 
+# Sends a MIDI system exclusive message to the selected output
+
 require "alsa-rawmidi"
 
 output = AlsaRawMIDI::Output.first
