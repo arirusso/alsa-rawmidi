@@ -233,11 +233,39 @@ module AlsaRawMIDI
     # Frees the global configuration tree in snd_config.
     attach_function :snd_config_update_free_global, [], :int # (void)
 
-    # @param [SndCtlCardInfo] info
-    def get_subdevice_count(info)
-      subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
-      subdev_count = 0 if subdev_count > 32
-      subdev_count
+    module Soundcard
+
+      extend self
+
+      # @param [SndCtlCardInfo] info
+      # @return [Fixnum]
+      def get_subdevice_count(info)
+        subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
+        subdev_count = 0 if subdev_count > 32
+        subdev_count
+      end
+
+      # @param [Fixnum] id
+      # @return [String]
+      def get_name(id)
+        "hw:#{id.to_s}"
+      end
+
+      # Does a soundcard exist for the given id?
+      # @param [Fixnum] id
+      # @return [Boolean]
+      def exists?(id)
+        API.snd_card_load(id) == 1
+      end
+
+      # @param [Fixnum] id
+      # @return [Fixnum]
+      def get_handle(id)
+        handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
+        API.snd_ctl_open(handle_pointer, get_name(id), 0)
+        handle_pointer.read_int
+      end
+
     end
 
   end
