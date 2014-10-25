@@ -251,7 +251,7 @@ module AlsaRawMIDI
 
       # Get the next bytes from the buffer
       # @return [String]
-      def poll_system_buffer(handle)
+      def poll(handle)
         buffer = FFI::MemoryPointer.new(:uint8, BUFFER_SIZE)
         if (err = API.snd_rawmidi_read(handle, buffer, BUFFER_SIZE)) < 0
           raise "Can't read MIDI input: #{API.snd_strerror(err)}" unless err.eql?(-11)
@@ -300,6 +300,21 @@ module AlsaRawMIDI
     module Device
 
       extend self
+
+      # @param [Fixnum] id
+      # @param [Symbol] direction
+      # @return [SndCtlCardInfo]
+      def get_info(id, direction)
+        stream_key = case direction
+        when :input then :SND_RAWMIDI_STREAM_INPUT
+        when :output then :SND_RAWMIDI_STREAM_OUTPUT
+        end
+        stream = API::CONSTANTS[stream_key]
+        info = API::SndRawMIDIInfo.new
+        API.snd_rawmidi_info_set_device(info.pointer, id)
+        API.snd_rawmidi_info_set_stream(info.pointer, stream)
+        info
+      end
 
       # Close the device with the given handle
       # @param [Fixnum] handle
@@ -354,29 +369,14 @@ module AlsaRawMIDI
         API.snd_ctl_rawmidi_info(handle, info.pointer) >= 0
       end
 
-      # @param [Symbol] direction
-      # @param [Fixnum] device_id
-      # @return [SndCtlCardInfo]
-      def get_info(direction, device_id)
-        stream_key = case direction
-        when :input then :SND_RAWMIDI_STREAM_INPUT
-        when :output then :SND_RAWMIDI_STREAM_OUTPUT
-        end
-        stream = API::CONSTANTS[stream_key]
-        info = API::SndRawMIDIInfo.new
-        API.snd_rawmidi_info_set_device(info.pointer, device_id)
-        API.snd_rawmidi_info_set_stream(info.pointer, stream)
-        info
-      end
-
       # @param [Fixnum] soundcard_id
       # @param [Fixnum] device_id
       # @param [Symbol] direction
       # @param [Proc] block
       # @return [Array<Object>]
       def get_subdevices(direction, soundcard_id, device_id, &block)
-        info = API::Soundcard.get_info(direction, device_id)
         handle = API::Soundcard.get_handle(soundcard_id)
+        info = API::Device.get_info(device_id, direction)
         i = 0
         subdev_count = 1
         available = []
