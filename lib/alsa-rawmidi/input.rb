@@ -72,7 +72,7 @@ module AlsaRawMIDI
     def close
       if @enabled
         Thread.kill(@listener)
-				API::Device.close(@resource)
+        API::Device.close(@resource)
         @enabled = false
         true
       else
