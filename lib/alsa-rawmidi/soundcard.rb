@@ -75,7 +75,7 @@ module AlsaRawMIDI
       while i <= subdev_count
         API.snd_rawmidi_info_set_subdevice(info.pointer, i)
         if API.snd_ctl_rawmidi_info(@pointer, info.pointer) >= 0
-          subdev_count = get_subdev_count(info) if i.zero?
+          subdev_count = API.get_subdevice_count(info) if i.zero?
           device_hash = {
             :direction => direction,
             :id => i,
@@ -102,12 +102,6 @@ module AlsaRawMIDI
       API.snd_rawmidi_info_set_device(info.pointer, device_num)
       API.snd_rawmidi_info_set_stream(info.pointer, stream)
       info
-    end
-
-    def get_subdev_count(info)
-      subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
-      subdev_count = 0 if subdev_count > 32
-      subdev_count
     end
 
     # Instantiate a new device object
