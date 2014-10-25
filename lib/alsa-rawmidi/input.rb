@@ -52,9 +52,7 @@ module AlsaRawMIDI
     def enable(options = {}, &block)
       unless @enabled
         @start_time = Time.now.to_f
-        handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-        API.snd_rawmidi_open(handle_ptr, nil, @system_id, API::CONSTANTS[:SND_RAWMIDI_NONBLOCK])
-        @handle = handle_ptr.read_int
+        @handle = API::Input.open(@system_id)
         @enabled = true
         initialize_buffer
         spawn_listener

@@ -63,9 +63,7 @@ module AlsaRawMIDI
     # @return [Output]
     def enable(options = {}, &block)
       unless @enabled
-        handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-        API.snd_rawmidi_open(nil, handle_ptr, @system_id, 0)
-        @handle = handle_ptr.read_int
+        @handle = API::Output.open(@system_id)
         @enabled = true
       end
       if block_given?

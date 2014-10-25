@@ -233,6 +233,38 @@ module AlsaRawMIDI
     # Frees the global configuration tree in snd_config.
     attach_function :snd_config_update_free_global, [], :int # (void)
 
+    # Wrapper for ALSA methods dealing with input
+    module Input
+
+      extend self
+
+      # Open the output with the given ID
+      # @param [Fixnum] id
+      # @return [Fixnum]
+      def open(id)
+        API::Device.open(id) do |pointer|
+          API.snd_rawmidi_open(pointer, nil, id,  API::CONSTANTS[:SND_RAWMIDI_NONBLOCK])
+        end
+      end
+
+    end
+
+    # Wrapper for ALSA methods dealing with output
+    module Output
+
+      extend self
+
+      # Open the output with the given ID
+      # @param [Fixnum] id
+      # @return [Fixnum]
+      def open(id)
+        API::Device.open(id) do |pointer|
+          API.snd_rawmidi_open(nil, pointer, id, 0)
+        end
+      end
+
+    end
+
     # Wrapper for ALSA methods dealing with devices
     module Device
 
@@ -245,6 +277,16 @@ module AlsaRawMIDI
         API.snd_rawmidi_drain(handle)
         API.snd_rawmidi_close(handle)
         true
+      end
+
+      # Open the device with the given id
+      # @param [Fixnum] id
+      # @param [Proc] block
+      # @return [Fixnum]
+      def open(id, &block)
+        handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
+        yield(handle_pointer)
+        handle_pointer.read_int
       end
 
     end
