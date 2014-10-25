@@ -50,7 +50,7 @@ module AlsaRawMIDI
     def enable(options = {}, &block)
       unless @enabled
         @start_time = Time.now.to_f
-        @handle = API::Input.open(@system_id)
+        @resource = API::Input.open(@system_id)
         @enabled = true
         initialize_buffer
         spawn_listener
@@ -72,7 +72,7 @@ module AlsaRawMIDI
     def close
       if @enabled
         Thread.kill(@listener)
-				API::Device.close(@handle)
+				API::Device.close(@resource)
         @enabled = false
         true
       else
@@ -150,10 +150,10 @@ module AlsaRawMIDI
       @listener = Thread.new do
         begin
           loop do
-            while (messages = API::Input.poll_system_buffer(@handle)).nil?
+            while (messages = API::Input.poll(@resource)).nil?
               sleep(interval)
             end
-            populate_local_buffer(messages) unless messages.nil?
+            populate_buffer(messages) unless messages.nil?
           end
         rescue Exception => exception
           Thread.main.raise(exception)
@@ -165,7 +165,7 @@ module AlsaRawMIDI
 
     # Collect messages from the system buffer
     # @return [Array<String>, nil]
-    def populate_local_buffer(messages)
+    def populate_buffer(messages)
       @buffer << get_message_formatted(messages, now) unless messages.nil?
     end
 

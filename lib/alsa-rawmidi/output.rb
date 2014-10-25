@@ -9,7 +9,7 @@ module AlsaRawMIDI
     # @return [Boolean]
     def close
       if @enabled
-        API::Device.close(@handle)
+        API::Device.close(@resource)
         @enabled = false
         true
       else
@@ -36,7 +36,7 @@ module AlsaRawMIDI
     # @param [*Fixnum] data
     # @return [Boolean]
     def puts_bytes(*data)
-      API::Output.puts(@handle, data)
+      API::Output.puts(@resource, data)
       true
     end
 
@@ -58,7 +58,7 @@ module AlsaRawMIDI
     # @return [Output]
     def enable(options = {}, &block)
       unless @enabled
-        @handle = API::Output.open(@system_id)
+        @resource = API::Output.open(@system_id)
         @enabled = true
       end
       if block_given?
