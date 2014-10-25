@@ -22,10 +22,12 @@ class AlsaRawMIDI::IoTest < Test::Unit::TestCase
           @messages_arr = @messages.inject(&:+).flatten
           @received_arr = []
         end
-teardown do
-  @input.close
-  @output.close
-end
+
+        teardown do
+          @input.close
+          @output.close
+        end
+        
         should "do IO" do
           @messages.each do |message|
 
