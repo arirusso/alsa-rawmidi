@@ -45,14 +45,13 @@ module AlsaRawMIDI
     end
 
     def get_subdevices(direction, device_id, &block)
-      info = get_info(direction, device_id)
+      info = API::Soundcard.get_info(direction, device_id)
       handle = API::Soundcard.get_handle(@id)
       i = 0
       subdev_count = 1
       available = []
       while i <= subdev_count
-        API.snd_rawmidi_info_set_subdevice(info.pointer, i)
-        if API.snd_ctl_rawmidi_info(handle, info.pointer) >= 0
+        if API::Soundcard.valid_subdevice?(info, i, handle)
           subdev_count = API::Soundcard.get_subdevice_count(info) if i.zero?
           device_hash = {
             :direction => direction,
@@ -68,18 +67,6 @@ module AlsaRawMIDI
         end
       end
       available
-    end
-
-    def get_info(direction, device_num)
-      stream_key = case direction
-      when :input then :SND_RAWMIDI_STREAM_INPUT
-      when :output then :SND_RAWMIDI_STREAM_OUTPUT
-      end
-      stream = API::CONSTANTS[stream_key]
-      info = API::SndRawMIDIInfo.new
-      API.snd_rawmidi_info_set_device(info.pointer, device_num)
-      API.snd_rawmidi_info_set_stream(info.pointer, stream)
-      info
     end
 
     # Instantiate a new device object

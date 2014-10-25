@@ -245,6 +245,30 @@ module AlsaRawMIDI
         subdev_count
       end
 
+      # @param [SndCtlCardInfo] info
+      # @param [Fixnum] id
+      # @param [Fixnum] handle
+      # @return [Boolean]
+      def valid_subdevice?(info, id, handle)
+        API.snd_rawmidi_info_set_subdevice(info.pointer, id)
+        API.snd_ctl_rawmidi_info(handle, info.pointer) >= 0
+      end
+
+      # @param [Symbol] direction
+      # @param [Fixnum] device_id
+      # @return [SndCtlCardInfo]
+      def get_info(direction, device_id)
+        stream_key = case direction
+        when :input then :SND_RAWMIDI_STREAM_INPUT
+        when :output then :SND_RAWMIDI_STREAM_OUTPUT
+        end
+        stream = API::CONSTANTS[stream_key]
+        info = API::SndRawMIDIInfo.new
+        API.snd_rawmidi_info_set_device(info.pointer, device_id)
+        API.snd_rawmidi_info_set_stream(info.pointer, stream)
+        info
+      end
+
       # @param [Fixnum] id
       # @return [Array<Fixnum>]
       def get_subdevice_ids(id)
