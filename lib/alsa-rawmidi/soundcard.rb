@@ -34,11 +34,6 @@ module AlsaRawMIDI
       end
     end
 
-    def unpack(string)
-      arr = string.delete_if(&:zero?)
-      arr.pack("C#{arr.length}")
-    end
-
     # @param [Fixnum, String] device_num
     # @param [Fixnum] subdev_count
     # @param [Fixnum] id
