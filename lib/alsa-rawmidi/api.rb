@@ -233,7 +233,23 @@ module AlsaRawMIDI
     # Frees the global configuration tree in snd_config.
     attach_function :snd_config_update_free_global, [], :int # (void)
 
-    # Wrapper for ALSA methods dealing with the soundcard and devices
+    # Wrapper for ALSA methods dealing with devices
+    module Device
+
+      extend self
+
+      # Close the device with the given handle
+      # @param [Fixnum] handle
+      # @return [Boolean]
+      def close(handle)
+        API.snd_rawmidi_drain(handle)
+        API.snd_rawmidi_close(handle)
+        true
+      end
+
+    end
+
+    # Wrapper for ALSA methods dealing with the soundcard and subdevices
     module Soundcard
 
       extend self

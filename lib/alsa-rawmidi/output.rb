@@ -9,8 +9,7 @@ module AlsaRawMIDI
     # @return [Boolean]
     def close
       if @enabled
-        API.snd_rawmidi_drain(@handle)
-        API.snd_rawmidi_close(@handle)
+        API::Device.close(@handle)
         @enabled = false
         true
       else
@@ -98,7 +97,7 @@ module AlsaRawMIDI
     def self.all
       Device.all_by_type[:output]
     end
-    
+
   end
 
 end

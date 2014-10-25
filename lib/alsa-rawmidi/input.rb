@@ -76,8 +76,7 @@ module AlsaRawMIDI
     def close
       if @enabled
         Thread.kill(@listener)
-        API.snd_rawmidi_drain(@handle)
-        API.snd_rawmidi_close(@handle)
+				API::Device.close(@handle)
         @enabled = false
         true
       else
