@@ -271,6 +271,20 @@ module AlsaRawMIDI
 
       extend self
 
+      # Send the given MIDI data to the output with the given handle
+      # @param [Fixnum] handle
+      # @param [Array<Fixnum>] data
+      # @return [Boolean]
+      def puts(handle, data)
+        format = "C" * data.size
+        pointer = FFI::MemoryPointer.new(data.size)
+        bytes = pointer.put_bytes(0, data.pack(format))
+
+        API.snd_rawmidi_write(handle, bytes.to_i, data.size)
+        API.snd_rawmidi_drain(handle)
+        true
+      end
+
       # Open the output with the given ID
       # @param [Fixnum] id
       # @return [Fixnum]

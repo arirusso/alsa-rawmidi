@@ -36,12 +36,7 @@ module AlsaRawMIDI
     # @param [*Fixnum] data
     # @return [Boolean]
     def puts_bytes(*data)
-
-      format = "C" * data.size
-      bytes = FFI::MemoryPointer.new(data.size).put_bytes(0, data.pack(format))
-
-      API.snd_rawmidi_write(@handle, bytes.to_i, data.size)
-      API.snd_rawmidi_drain(@handle)
+      API::Output.puts(@handle, data)
       true
     end
 
