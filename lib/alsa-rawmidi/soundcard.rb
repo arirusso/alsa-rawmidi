@@ -23,7 +23,7 @@ module AlsaRawMIDI
     private
 
     def populate_subdevices
-      ids = API::Soundcard.get_subdevice_ids(@id)
+      ids = API::Soundcard.get_device_ids(@id)
       ids.each do |id|
         @subdevices.keys.each do |direction|
           devices = get_subdevices(direction, id) do |device_hash|
@@ -32,16 +32,6 @@ module AlsaRawMIDI
           @subdevices[direction] += devices
         end
       end
-    end
-
-    # @param [Fixnum, String] device_num
-    # @param [Fixnum] subdev_count
-    # @param [Fixnum] id
-    # @return [String]
-    def get_alsa_subdev_id(device_id, subdev_count, id)
-      ext = (subdev_count > 1) ? ",#{id}" : ''
-      name = API::Soundcard.get_name(@id)
-      "#{name},#{device_id.to_s}#{ext}"
     end
 
     def get_subdevices(direction, device_id, &block)
@@ -77,7 +67,7 @@ module AlsaRawMIDI
       when :input then Input
       when :output then Output
       end
-      system_id = get_alsa_subdev_id(device_hash[:device_id], device_hash[:subdev_count], device_hash[:id])
+      system_id = API::Soundcard.get_subdevice_id(@id, device_hash[:device_id], device_hash[:subdev_count], device_hash[:id])
       info = device_hash[:info]
       device_class.new(:system_id => system_id, :name => info[:name].to_s, :subname => info[:subname].to_s)
     end

@@ -245,6 +245,16 @@ module AlsaRawMIDI
         subdev_count
       end
 
+      # @param [Fixnum, String] device_num
+      # @param [Fixnum] subdev_count
+      # @param [Fixnum] id
+      # @return [String]
+      def get_subdevice_id(soundcard_id, device_id, subdev_count, id)
+        ext = (subdev_count > 1) ? ",#{id}" : ''
+        name = API::Soundcard.get_name(soundcard_id)
+        "#{name},#{device_id.to_s}#{ext}"
+      end
+
       # @param [SndCtlCardInfo] info
       # @param [Fixnum] id
       # @param [Fixnum] handle
@@ -271,7 +281,7 @@ module AlsaRawMIDI
 
       # @param [Fixnum] id
       # @return [Array<Fixnum>]
-      def get_subdevice_ids(id)
+      def get_device_ids(id)
         handle = API::Soundcard.get_handle(id)
         (0..31).to_a.select do |n|
           device_id = FFI::MemoryPointer.new(:int).write_int(n)
@@ -279,10 +289,10 @@ module AlsaRawMIDI
         end
       end
 
-      # @param [Fixnum] id
+      # @param [Fixnum] soundcard_id
       # @return [String]
-      def get_name(id)
-        "hw:#{id.to_s}"
+      def get_name(soundcard_id)
+        "hw:#{soundcard_id.to_s}"
       end
 
       # Does a soundcard exist for the given id?
@@ -292,11 +302,11 @@ module AlsaRawMIDI
         API.snd_card_load(id) == 1
       end
 
-      # @param [Fixnum] id
+      # @param [Fixnum] soundcard_id
       # @return [Fixnum]
-      def get_handle(id)
+      def get_handle(soundcard_id)
         handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
-        API.snd_ctl_open(handle_pointer, get_name(id), 0)
+        API.snd_ctl_open(handle_pointer, get_name(soundcard_id), 0)
         handle_pointer.read_int
       end
 
