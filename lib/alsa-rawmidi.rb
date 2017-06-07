@@ -13,6 +13,7 @@ require "ffi"
 # modules
 require "alsa-rawmidi/api"
 require "alsa-rawmidi/device"
+require "alsa-rawmidi/version"
 
 # class
 require "alsa-rawmidi/input"
@@ -20,7 +21,5 @@ require "alsa-rawmidi/output"
 require "alsa-rawmidi/soundcard"
 
 module AlsaRawMIDI
-
-  VERSION = "0.3.2"
 
 end
