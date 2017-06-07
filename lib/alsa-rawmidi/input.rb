@@ -171,7 +171,7 @@ module AlsaRawMIDI
 
     # Convert a hex string to an array of numeric bytes eg "904040" -> [0x90, 0x40, 0x40]
     # @param [String] string
-    # @return [Array<Fixnum>]
+    # @return [Array<Integer>]
     def hex_string_to_numeric_bytes(string)
       string = string.dup
       bytes = []
@@ -183,7 +183,7 @@ module AlsaRawMIDI
     end
 
     # Convert an array of numeric bytes to a hex string eg [0x90, 0x40, 0x40] -> "904040"
-    # @param [Array<Fixnum>] bytes
+    # @param [Array<Integer>] bytes
     # @return [String]
     def numeric_bytes_to_hex_string(bytes)
       string_bytes = bytes.map do |byte|

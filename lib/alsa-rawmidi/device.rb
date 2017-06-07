@@ -75,7 +75,7 @@ module AlsaRawMIDI
     end
 
     # @param [Hash] options
-    # @option options [Fixnum] :id
+    # @option options [Integer] :id
     # @option options [String] :name
     # @option options [String] :subname
     # @option options [String] :system_id
@@ -91,8 +91,8 @@ module AlsaRawMIDI
     private
 
     # Assign an id
-    # @param [Fixnum] id
-    # @return [Fixnum]
+    # @param [Integer] id
+    # @return [Integer]
     def id=(id)
       @id = id
     end

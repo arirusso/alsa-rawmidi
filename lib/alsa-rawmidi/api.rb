@@ -241,8 +241,8 @@ module AlsaRawMIDI
       extend self
 
       # Open the output with the given ID
-      # @param [Fixnum] id
-      # @return [Fixnum]
+      # @param [Integer] id
+      # @return [Integer]
       def open(id)
         API::Device.open(id) do |pointer|
           API.snd_rawmidi_open(pointer, nil, id,  API::CONSTANTS[:SND_RAWMIDI_NONBLOCK])
@@ -272,8 +272,8 @@ module AlsaRawMIDI
       extend self
 
       # Send the given MIDI data to the output with the given handle
-      # @param [Fixnum] handle
-      # @param [Array<Fixnum>] data
+      # @param [Integer] handle
+      # @param [Array<Integer>] data
       # @return [Boolean]
       def puts(handle, data)
         format = "C" * data.size
@@ -286,8 +286,8 @@ module AlsaRawMIDI
       end
 
       # Open the output with the given ID
-      # @param [Fixnum] id
-      # @return [Fixnum]
+      # @param [Integer] id
+      # @return [Integer]
       def open(id)
         API::Device.open(id) do |pointer|
           API.snd_rawmidi_open(nil, pointer, id, 0)
@@ -301,7 +301,7 @@ module AlsaRawMIDI
 
       extend self
 
-      # @param [Fixnum] id
+      # @param [Integer] id
       # @param [Symbol] direction
       # @return [SndCtlCardInfo]
       def get_info(id, direction)
@@ -317,7 +317,7 @@ module AlsaRawMIDI
       end
 
       # Close the device with the given handle
-      # @param [Fixnum] handle
+      # @param [Integer] handle
       # @return [Boolean]
       def close(handle)
         API.snd_rawmidi_drain(handle)
@@ -326,9 +326,9 @@ module AlsaRawMIDI
       end
 
       # Open the device with the given id
-      # @param [Fixnum] id
+      # @param [Integer] id
       # @param [Proc] block
-      # @return [Fixnum]
+      # @return [Integer]
       def open(id, &block)
         handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
         yield(handle_pointer)
@@ -343,16 +343,16 @@ module AlsaRawMIDI
       extend self
 
       # @param [SndCtlCardInfo] info
-      # @return [Fixnum]
+      # @return [Integer]
       def get_subdevice_count(info)
         subdev_count = API.snd_rawmidi_info_get_subdevices_count(info.pointer)
         subdev_count = 0 if subdev_count > 32
         subdev_count
       end
 
-      # @param [Fixnum, String] device_num
-      # @param [Fixnum] subdev_count
-      # @param [Fixnum] id
+      # @param [Integer, String] device_num
+      # @param [Integer] subdev_count
+      # @param [Integer] id
       # @return [String]
       def get_subdevice_id(soundcard_id, device_id, subdev_count, id)
         ext = (subdev_count > 1) ? ",#{id}" : ''
@@ -361,16 +361,16 @@ module AlsaRawMIDI
       end
 
       # @param [SndCtlCardInfo] info
-      # @param [Fixnum] id
-      # @param [Fixnum] handle
+      # @param [Integer] id
+      # @param [Integer] handle
       # @return [Boolean]
       def valid_subdevice?(info, id, handle)
         API.snd_rawmidi_info_set_subdevice(info.pointer, id)
         API.snd_ctl_rawmidi_info(handle, info.pointer) >= 0
       end
 
-      # @param [Fixnum] soundcard_id
-      # @param [Fixnum] device_id
+      # @param [Integer] soundcard_id
+      # @param [Integer] device_id
       # @param [Symbol] direction
       # @param [Proc] block
       # @return [Array<Object>]
@@ -398,8 +398,8 @@ module AlsaRawMIDI
         available
       end
 
-      # @param [Fixnum] id
-      # @return [Array<Fixnum>]
+      # @param [Integer] id
+      # @return [Array<Integer>]
       def get_device_ids(id)
         handle = API::Soundcard.get_handle(id)
         (0..31).to_a.select do |n|
@@ -408,21 +408,21 @@ module AlsaRawMIDI
         end
       end
 
-      # @param [Fixnum] soundcard_id
+      # @param [Integer] soundcard_id
       # @return [String]
       def get_name(soundcard_id)
         "hw:#{soundcard_id.to_s}"
       end
 
       # Does a soundcard exist for the given id?
-      # @param [Fixnum] id
+      # @param [Integer] id
       # @return [Boolean]
       def exists?(id)
         API.snd_card_load(id) == 1
       end
 
-      # @param [Fixnum] soundcard_id
-      # @return [Fixnum]
+      # @param [Integer] soundcard_id
+      # @return [Integer]
       def get_handle(soundcard_id)
         handle_pointer = FFI::MemoryPointer.new(FFI.type_size(:int))
         API.snd_ctl_open(handle_pointer, get_name(soundcard_id), 0)

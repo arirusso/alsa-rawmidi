@@ -4,7 +4,7 @@ module AlsaRawMIDI
 
     attr_reader :id, :subdevices
 
-    # @param [Fixnum] id
+    # @param [Integer] id
     def initialize(id)
       @subdevices = {
         :input => [],
@@ -15,7 +15,7 @@ module AlsaRawMIDI
     end
 
     # Find a soundcard by its ID
-    # @param [Fixnum] id
+    # @param [Integer] id
     # @return [Soundcard]
     def self.find(id)
       @soundcards ||= {}

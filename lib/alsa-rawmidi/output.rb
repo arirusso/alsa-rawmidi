@@ -33,7 +33,7 @@ module AlsaRawMIDI
     alias_method :puts_hex, :puts_s
 
     # Output a MIDI message in numeric byte format
-    # @param [*Fixnum] data
+    # @param [*Integer] data
     # @return [Boolean]
     def puts_bytes(*data)
       API::Output.puts(@resource, data)
@@ -41,7 +41,7 @@ module AlsaRawMIDI
     end
 
     # Output the given MIDI message
-    # @param [*Fixnum, *String] args
+    # @param [*Integer, *String] args
     # @return [Boolean]
     def puts(*args)
       case args.first
