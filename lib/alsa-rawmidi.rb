@@ -1,9 +1,11 @@
 #
-# Modules and classes to interact with the ALSA Driver Interface
+# alsa-rawmidi
+# ALSA Driver Interface
 #
-# Ari Russo
-# (c) 2010-2014
+# (c) 2010-2014 Ari Russo
 # Licensed under Apache 2.0
+# https://github.com/arirusso/alsa-rawmidi
+#
 
 # libs
 require "ffi"
