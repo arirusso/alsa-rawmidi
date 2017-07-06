@@ -7,8 +7,8 @@ module AlsaRawMIDI
     # @param [Integer] id
     def initialize(id)
       @subdevices = {
-        :input => [],
-        :output => []
+        input: [],
+        output: []
       }
       @id = id
       populate_subdevices
@@ -49,9 +49,9 @@ module AlsaRawMIDI
       when :output then Output
       end
       device_properties = {
-        :system_id => device_hash[:id],
-        :name => device_hash[:name],
-        :subname => device_hash[:subname]
+        system_id: device_hash[:id],
+        name: device_hash[:name],
+        subname: device_hash[:subname]
       }
       device_class.new(device_properties)
     end
