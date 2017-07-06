@@ -166,7 +166,9 @@ module AlsaRawMIDI
     # Collect messages from the system buffer
     # @return [Array<String>, nil]
     def populate_buffer(messages)
-      @buffer << get_message_formatted(messages, now) unless messages.nil?
+      unless messages.nil?
+        @buffer << get_message_formatted(messages, now)
+      end
     end
 
     # Convert a hex string to an array of numeric bytes eg "904040" -> [0x90, 0x40, 0x40]
