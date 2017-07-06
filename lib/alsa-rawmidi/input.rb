@@ -125,8 +125,8 @@ module AlsaRawMIDI
     # @return [Hash]
     def get_message_formatted(hexstring, timestamp)
       {
-        :data => hex_string_to_numeric_bytes(hexstring),
-        :timestamp => timestamp
+        data: hex_string_to_numeric_bytes(hexstring),
+        timestamp: timestamp
       }
     end
 
