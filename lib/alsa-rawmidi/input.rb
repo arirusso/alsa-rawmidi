@@ -49,7 +49,6 @@ module AlsaRawMIDI
     # @return [Input] self
     def enable(options = {}, &block)
       unless @enabled
-        @start_time = Time.now.to_f
         @resource = API::Input.open(@system_id)
         @enabled = true
         initialize_buffer
@@ -112,13 +111,6 @@ module AlsaRawMIDI
       @buffer
     end
 
-    # A timestamp for the current time
-    # @return [Float]
-    def now
-      time = Time.now.to_f - @start_time
-      time * 1000
-    end
-
     # A message paired with timestamp
     # @param [String] hexstring
     # @param [Float] timestamp
@@ -153,7 +145,9 @@ module AlsaRawMIDI
             while (messages = API::Input.poll(@resource)).nil?
               sleep(interval)
             end
-            populate_buffer(messages) unless messages.nil?
+            unless messages.nil?
+              populate_buffer(messages, Time.now.to_f)
+            end
           end
         rescue Exception => exception
           Thread.main.raise(exception)
@@ -165,10 +159,8 @@ module AlsaRawMIDI
 
     # Collect messages from the system buffer
     # @return [Array<String>, nil]
-    def populate_buffer(messages)
-      unless messages.nil?
-        @buffer << get_message_formatted(messages, now)
-      end
+    def populate_buffer(messages, timestamp)
+      @buffer << get_message_formatted(messages, timestamp)
     end
 
     # Convert a hex string to an array of numeric bytes eg "904040" -> [0x90, 0x40, 0x40]
