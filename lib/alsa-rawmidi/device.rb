@@ -1,10 +1,9 @@
-module AlsaRawMIDI
+# frozen_string_literal: true
 
+module AlsaRawMIDI
   # Functionality common to both inputs and outputs
   module Device
-
     module ClassMethods
-
       # Select the first device of the given direction
       # @param [Symbol] direction
       # @return [Input, Output]
@@ -37,38 +36,37 @@ module AlsaRawMIDI
       # @return [Hash]
       def get_devices
         available_devices = {
-          :input => [],
-          :output => []
+          input: [],
+          output: []
         }
         device_count = 0
         32.times do |i|
           card = Soundcard.find(i)
-          unless card.nil?
-            available_devices.keys.each do |direction|
-              devices = card.subdevices[direction]
-              devices.each do |dev|
-                dev.send(:id=, device_count)
-                device_count += 1
-              end
-              available_devices[direction] += devices
+          next if card.nil?
+
+          available_devices.each_key do |direction|
+            devices = card.subdevices[direction]
+            devices.each do |dev|
+              dev.send(:id=, device_count)
+              device_count += 1
             end
+            available_devices[direction] += devices
           end
         end
         available_devices
       end
-
     end
 
     extend ClassMethods
 
     attr_reader :enabled, # has the device been initialized?
-    :system_id, # the alsa id of the device
-    :id, # a local uuid for the device
-    :name,
-    :subname,
-    :type # :input or :output
+                :system_id, # the alsa id of the device
+                :id, # a local uuid for the device
+                :name,
+                :subname,
+                :type # :input or :output
 
-    alias_method :enabled?, :enabled
+    alias enabled? enabled
 
     def self.included(base)
       base.send(:extend, ClassMethods)
@@ -102,7 +100,5 @@ module AlsaRawMIDI
     def get_type
       self.class.name.split('::').last.downcase.to_sym
     end
-
   end
-
 end

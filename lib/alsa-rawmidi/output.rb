@@ -1,8 +1,8 @@
-module AlsaRawMIDI
+# frozen_string_literal: true
 
+module AlsaRawMIDI
   # Output device class
   class Output
-
     include Device
 
     # Close this output
@@ -23,14 +23,14 @@ module AlsaRawMIDI
     def puts_s(data)
       data = data.dup
       output = []
-      until (str = data.slice!(0,2)) == ""
+      until (str = data.slice!(0, 2)) == ''
         output << str.hex
       end
       puts_bytes(*output)
       true
     end
-    alias_method :puts_bytestr, :puts_s
-    alias_method :puts_hex, :puts_s
+    alias puts_bytestr puts_s
+    alias puts_hex puts_s
 
     # Output a MIDI message in numeric byte format
     # @param [*Integer] data
@@ -45,18 +45,18 @@ module AlsaRawMIDI
     # @return [Boolean]
     def puts(*args)
       case args.first
-        when Array then args.each { |arg| puts(*arg) }
-        when Numeric then puts_bytes(*args)
-        when String then puts_bytestr(*args)
+      when Array then args.each { |arg| puts(*arg) }
+      when Numeric then puts_bytes(*args)
+      when String then puts_bytestr(*args)
       end
     end
-    alias_method :write, :puts
+    alias write puts
 
     # Enable this device; yields
     # @param [Hash] options
     # @param [Proc] block
     # @return [Output]
-    def enable(options = {}, &block)
+    def enable(_options = {})
       unless @enabled
         @resource = API::Output.open(@system_id)
         @enabled = true
@@ -70,8 +70,8 @@ module AlsaRawMIDI
       end
       self
     end
-    alias_method :open, :enable
-    alias_method :start, :enable
+    alias open enable
+    alias start enable
 
     # The first available output
     # @return [Output]
@@ -90,7 +90,5 @@ module AlsaRawMIDI
     def self.all
       Device.all_by_type[:output]
     end
-
   end
-
 end

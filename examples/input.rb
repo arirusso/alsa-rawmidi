@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 dir = File.dirname(File.expand_path(__FILE__))
-$LOAD_PATH.unshift dir + "/../lib"
+$LOAD_PATH.unshift "#{dir}/../lib"
 
-require "alsa-rawmidi"
+require 'alsa-rawmidi'
 
 # Selects the first MIDI input and prints the first 10 messages it receives to standard out
 
@@ -13,14 +14,12 @@ num_messages = 10
 # or amidi -l from the command line
 
 AlsaRawMIDI::Input.first.open do |input|
-
-  puts "send some MIDI to your input now..."
+  puts 'send some MIDI to your input now...'
 
   num_messages.times do
     m = input.gets
     puts(m)
   end
 
-  puts "finished"
-
+  puts 'finished'
 end
