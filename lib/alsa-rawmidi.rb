@@ -4,7 +4,7 @@
 # alsa-rawmidi
 # ALSA Driver Interface
 #
-# (c) 2010-2014 Ari Russo
+# (c) 2010-2022 Ari Russo
 # Licensed under Apache 2.0
 # https://github.com/arirusso/alsa-rawmidi
 #
