@@ -1,9 +1,8 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
 
-group :test do
-  gem "mocha"
-  gem "rake"
-  gem "shoulda-context"
-end
+source 'https://rubygems.org'
 
-gem "ffi"
+gem 'ffi', '~> 1.15', '>= 1.15.5'
+gem 'rake', '~> 13.0', '>= 13.0.6', groups: %i[development test]
+gem 'rspec', '~> 3.11', '>= 3.11.0', groups: %i[test]
+gem 'rubocop', '~> 1.10', '>= 1.10.0', groups: %i[development test], require: false

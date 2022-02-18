@@ -45,4 +45,4 @@ Otherwise
 
 Apache 2.0, See the file LICENSE
 
-Copyright (c) 2010-2017 Ari Russo  
+Copyright (c) 2010-2022 Ari Russo  

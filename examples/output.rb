@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 dir = File.dirname(File.expand_path(__FILE__))
-$LOAD_PATH.unshift dir + "/../lib"
+$LOAD_PATH.unshift "#{dir}/../lib"
 
-require "alsa-rawmidi"
+require 'alsa-rawmidi'
 
 # Selects the first MIDI output and sends some arpeggiated chords to it
 
@@ -14,23 +15,17 @@ duration = 0.1
 # AlsaRawMIDI::Device.all.to_s will list your midi devices
 # or amidi -l from the command line
 
-puts "Press Control-C to exit..."
+puts 'Press Control-C to exit...'
 
 AlsaRawMIDI::Output.first.open do |output|
-
   loop do
-    (0..((octaves-1)*12)).step(12) do |oct|
-
+    (0..((octaves - 1) * 12)).step(12) do |oct|
       notes.each do |note|
-
-        output.puts(0x90, note + oct, 100) # note on
-        sleep(duration)				     # wait
-        output.puts(0x80, note + oct, 100) # note off
+        output.puts(0x90, note + oct, 100) # NOTE: on
+        sleep(duration) # wait
+        output.puts(0x80, note + oct, 100) # NOTE: off
         sleep(duration)
-
       end
-
     end
   end
-
 end
